@@ -53,7 +53,7 @@ int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
-   freopen("aoc-2024-day-05-challenge-1.txt", "r", stdin);
+   freopen("in.txt", "r", stdin);
 
    string line;
    while (getline(cin, line) && !line.empty()) {
@@ -79,16 +79,16 @@ int main() {
       while (getline(ss, temp, ',')) {
          V.push_back(stoi(temp));
       }
-      bool valid = true;
+      bool isSorted = true;
       for (int i = 0; i < int(V.size()); i++) {
          for (int j = i + 1; j < int(V.size()); j++) {
             if (inOrder[V[j]][V[i]]) {
-               valid = false;
+               isSorted = false;
                break;
             }
          }
       }
-      if (!valid) {
+      if (!isSorted) {
          ans2 += topologicalSort(V);
       }
       else {
@@ -96,7 +96,7 @@ int main() {
       }
    }
 
-   cout << ans1 * ans2 << endl;
+   cout << ans1 << " " << ans2 << " " << ans1 * ans2 << endl;
 
    return 0;
 }
