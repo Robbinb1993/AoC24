@@ -30,8 +30,9 @@ int solvePart1(vector<int>& values) {
 int solvePart2(vector<int>& values) {
    int medianSum = 0;
    if (!is_sorted(values.begin(), values.end(), customComparator)) {
-      sort(values.begin(), values.end(), customComparator);
-      medianSum += values[int(values.size()) / 2];
+      auto mid = values.begin() + values.size() / 2;
+      nth_element(values.begin(), mid, values.end(), customComparator);
+      medianSum += *mid;
    }
    return medianSum;
 }
