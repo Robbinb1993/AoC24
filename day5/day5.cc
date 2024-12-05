@@ -7,7 +7,7 @@ int inOrder[MAXN][MAXN];
 vector<int> edges[MAXN];
 int inDegree[MAXN];
 
-int topologicalSort(vector<int>& V) {
+int topologicalSort(const vector<int>& V) {
    unordered_map<int, bool> inList;
 
    for (auto& v : V) {
@@ -46,7 +46,7 @@ int topologicalSort(vector<int>& V) {
          }
       }
    }
-   return -1;
+   throw("No topological sort possible.");
 }
 
 int main() {
