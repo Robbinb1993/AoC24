@@ -50,10 +50,9 @@ int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
-   freopen("aoc-2024-day-05-challenge-2.txt", "r", stdin);
-   //get line until line is empty
-   string line;
+   freopen("aoc-2024-day-05-challenge-1.txt", "r", stdin);
 
+   string line;
    while (getline(cin, line) && !line.empty()) {
       string left, right;
       stringstream ss(line);
