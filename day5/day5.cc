@@ -1,15 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int inOrder[100][100];
-vector<int> edges[100];
-int inDegree[100];
+const int MAXN = 100;
+
+int inOrder[MAXN][MAXN];
+vector<int> edges[MAXN];
+int inDegree[MAXN];
 
 int topologicalSort(vector<int>& V) {
    unordered_map<int, bool> inList;
-   memset(inDegree, 0, sizeof(inDegree));
+
    for (auto& v : V) {
       inList[v] = true;
+      inDegree[v] = 0;
    }
    for (auto& v : V) {
       for (auto& u : edges[v]) {
