@@ -7,7 +7,6 @@ int R, C;
 vector<string> grid;
 vector<vector<array<int, 4>>> nxt, visited;
 
-
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
 
@@ -190,7 +189,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-06-challenge-1.txt", "r", stdin);
+   freopen("aoc-2024-day-06-challenge-3.txt", "r", stdin);
 
    string line;
    while (cin >> line) {
