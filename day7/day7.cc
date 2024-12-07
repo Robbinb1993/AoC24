@@ -9,7 +9,7 @@ int runItr = 1;
 
 vector<int> P;
 
-bool possible(const int idx, const long long& rem, const vector<int>& V, const bool isPart2) {
+bool possible(const int idx, const long long rem, const vector<int>& V, const bool isPart2) {
    if (idx == 0) {
       return rem == V[0];
    }
@@ -37,7 +37,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-07-challenge-1.txt", "r", stdin);
+   freopen("aoc-2024-day-07-challenge-3.txt", "r", stdin);
 
    vector<vector<int>> lists;
    vector<long long> totals;
