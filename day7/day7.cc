@@ -2,6 +2,13 @@
 using namespace std;
 using namespace chrono;
 
+const int MAX_N = 100000;
+const int MAX_LIST_SIZE = 100;
+int DP[MAX_LIST_SIZE][MAX_N];
+int runItr = 1;
+
+vector<int> P;
+
 bool possible(const int idx, const long long& rem, const vector<int>& V, const bool isPart2) {
    if (idx == 0) {
       return rem == V[0];
@@ -9,27 +16,18 @@ bool possible(const int idx, const long long& rem, const vector<int>& V, const b
    if (rem == 0 && V[idx] == 0) {
       return true;
    }
-   if (rem >= V[idx]) {
-      if (possible(idx - 1, rem - V[idx], V, isPart2)) {
-         return true;
-      }
+   if (rem < MAX_N) {
+      if (DP[idx][rem] == runItr) return false;
+      DP[idx][rem] = runItr;
    }
-   if (V[idx] != 0 && rem % V[idx] == 0) {
-      if (possible(idx - 1, rem / V[idx], V, isPart2)) {
-         return true;
-      }
-   }
+   if (rem >= V[idx] && possible(idx - 1, rem - V[idx], V, isPart2)) return true;
+   if (V[idx] != 0 && rem % V[idx] == 0 && possible(idx - 1, rem / V[idx], V, isPart2)) return true;
    if (isPart2) {
-      string S = to_string(V[idx]);
-      string M = to_string(rem);
-      if (M.length() > S.length() && M.ends_with(S)) {
-         M.erase(M.size() - S.size());
-         if (possible(idx - 1, stoll(M), V, isPart2)) {
-            return true;
-         }
+      long long p = P[idx];
+      if (rem >= p && rem % p == V[idx]) {
+         if (possible(idx - 1, rem / p, V, isPart2)) return true;
       }
    }
-
    return false;
 }
 
@@ -58,9 +56,19 @@ int main() {
    long long ans[2] = {0, 0};
    for (int part = 1; part <= 2; part++) {
       for (int i = 0; i < int(totals.size()); i++) {
+         if (part == 2) {
+            P.assign(lists[i].size(), 0);
+            for (int j = 0; j < (int)lists[i].size(); j++) {
+               int suffix = lists[i][j];
+               long long p = (suffix == 0) ? 10 : 1;
+               for (int x = suffix; x > 0; x /= 10) p *= 10;
+               P[j] = p;
+            }
+         }
          if (possible(int(lists[i].size()) - 1, totals[i], lists[i], part == 2)) {
             ans[part - 1] += totals[i];
          }
+         runItr++;
       }
    }
 
