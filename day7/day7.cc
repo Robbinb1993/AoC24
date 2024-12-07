@@ -20,14 +20,14 @@ bool possible(const int idx, const long long rem, const vector<int>& V, const bo
       if (DP[idx][rem] == runItr) return false;
       DP[idx][rem] = runItr;
    }
-   if (rem >= V[idx] && possible(idx - 1, rem - V[idx], V, isPart2)) return true;
-   if (V[idx] != 0 && rem % V[idx] == 0 && possible(idx - 1, rem / V[idx], V, isPart2)) return true;
    if (isPart2) {
       long long p = P[idx];
       if (rem >= p && rem % p == V[idx]) {
          if (possible(idx - 1, rem / p, V, isPart2)) return true;
       }
    }
+   if (V[idx] != 0 && rem % V[idx] == 0 && possible(idx - 1, rem / V[idx], V, isPart2)) return true;
+   if (rem >= V[idx] && possible(idx - 1, rem - V[idx], V, isPart2)) return true;
    return false;
 }
 
@@ -37,7 +37,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-07-challenge-3.txt", "r", stdin);
+   freopen("aoc-2024-day-07-challenge-2.txt", "r", stdin);
 
    vector<vector<int>> lists;
    vector<long long> totals;
