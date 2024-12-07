@@ -126,6 +126,8 @@ void removeObstacle(int x, int y) {
    }
 }
 
+vector<array<int, 3>> path;
+
 int part1(int x, int y) {
    int d = 0;
    int ans = 0;
@@ -137,6 +139,9 @@ int part1(int x, int y) {
          ans++;
          grid[x][y] = 'X';
       }
+
+      path.push_back({x, y, d});
+
       while (true) {
          x += DX[d];
          y += DY[d];
@@ -212,16 +217,23 @@ int main() {
 
    int ansPart2 = 0;
 
-   for (int i = 0; i < R; i++) {
-      for (int j = 0; j < C; j++) {
-         if (grid[i][j] != 'X') {
-            continue;
-         }
-         addObstacle(i, j);
-         ansPart2 += part2(sx, sy, 0);
-         runItr++;
-         removeObstacle(i, j);
+   for (auto& state : path) {
+      int x = state[0], y = state[1], d = state[2];
+      int ox = x + DX[d];
+      int oy = y + DY[d];
+
+      if (ox < 0 || ox >= R || oy < 0 || oy >= C) {
+         continue;
       }
+
+      if (grid[ox][oy] != 'X') {
+         continue;
+      }
+
+      addObstacle(ox, oy);
+      ansPart2 += part2(x, y, d);
+      runItr++;
+      removeObstacle(ox, oy);
    }
 
    cout << ansPart2 << endl;
