@@ -2,7 +2,7 @@
 using namespace std;
 using namespace chrono;
 
-const int MAX_N = 100000;
+const int MAX_N = 500000;
 const int MAX_LIST_SIZE = 100;
 int DP[MAX_LIST_SIZE][MAX_N];
 int runItr = 1;
