@@ -37,7 +37,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-07-challenge-3.txt", "r", stdin);
+   freopen("aoc-2024-day-07-challenge-1.txt", "r", stdin);
 
    vector<vector<int>> lists;
    vector<long long> totals;
