@@ -46,10 +46,6 @@ int main() {
 
    for (string line; getline(cin, line); ) {
       auto pos = line.find(':');
-      if (pos == string::npos) {
-         cerr << "Invalid format: " << line << '\n';
-         continue;
-      }
       totals.push_back(stoll(line.substr(0, pos)));
 
       vector<int> tempList;
