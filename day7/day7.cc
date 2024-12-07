@@ -33,8 +33,6 @@ bool possible(const int idx, const long long& rem, const vector<int>& V, const b
    return false;
 }
 
-long long ans[2];
-
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
@@ -61,6 +59,7 @@ int main() {
       lists.push_back(move(tempList));
    }
 
+   long long ans[2] = {0, 0};
    for (int part = 1; part <= 2; part++) {
       for (int i = 0; i < int(totals.size()); i++) {
          if (possible(int(lists[i].size()) - 1, totals[i], lists[i], part == 2)) {
