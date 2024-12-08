@@ -15,7 +15,7 @@ int main() {
    while (getline(cin, line)) {
       grid.push_back(line);
    }
-   vector<vector<bool>> antinodes(grid.size(), vector<bool>(grid[0].size(), 0));
+   vector<vector<bool>> isAntinode(grid.size(), vector<bool>(grid[0].size(), 0));
 
    map<char, vector<pair<int, int>>> antennas;
    for (int i = 0; i < grid.size(); i++) {
@@ -34,7 +34,7 @@ int main() {
             int nx = p[i].first;
             int ny = p[i].second;
             do {
-               antinodes[nx][ny] = true;
+               isAntinode[nx][ny] = true;
                nx += dx;
                ny += dy;
             } while (nx >= 0 && nx < grid.size() && ny >= 0 && ny < grid[0].size());
@@ -43,7 +43,7 @@ int main() {
             nx = p[j].first;
             ny = p[j].second;
             do {
-               antinodes[nx][ny] = true;
+               isAntinode[nx][ny] = true;
                nx -= dx;
                ny -= dy;
             } while (nx >= 0 && nx < grid.size() && ny >= 0 && ny < grid[0].size());
@@ -54,7 +54,7 @@ int main() {
    int totAntinodes = 0;
    for (int i = 0; i < grid.size(); i++) {
       for (int j = 0; j < grid[i].size(); j++) {
-         totAntinodes += (antinodes[i][j] == true);
+         totAntinodes += (isAntinode[i][j] == true);
       }
    }
 
