@@ -2,7 +2,7 @@
 using namespace std;
 using namespace chrono;
 
-const int MAX_N = 500000;
+const int MAX_N = 100000;
 const int MAX_LIST_SIZE = 100;
 int DP[MAX_LIST_SIZE][MAX_N];
 int runItr = 1;
@@ -20,6 +20,7 @@ bool possible(const int idx, const long long rem, const vector<int>& V, const bo
       if (DP[idx][rem] == runItr) return false;
       DP[idx][rem] = runItr;
    }
+
    if (isPart2) {
       long long p = P[idx];
       if (rem >= p && rem % p == V[idx]) {
@@ -28,6 +29,7 @@ bool possible(const int idx, const long long rem, const vector<int>& V, const bo
    }
    if (V[idx] != 0 && rem % V[idx] == 0 && possible(idx - 1, rem / V[idx], V, isPart2)) return true;
    if (rem >= V[idx] && possible(idx - 1, rem - V[idx], V, isPart2)) return true;
+
    return false;
 }
 
@@ -37,7 +39,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-07-challenge-2.txt", "r", stdin);
+   freopen("aoc-2024-day-07-challenge-3.txt", "r", stdin);
 
    vector<vector<int>> lists;
    vector<long long> totals;
