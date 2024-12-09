@@ -6,62 +6,17 @@ using namespace chrono;
 vector<int> fileSystem;
 
 int treeSize;
+int base;
 vector<int> freeSpace, startPos;
-
-void build(const int L, const int R, const int idx, const vector<pair<int, int>>& freeBlocks) {
-   if (L == R) {
-      freeSpace[idx] = freeBlocks[L].second;
-      startPos[idx] = freeBlocks[L].first;
-      return;
-   }
-   int M = (L + R) / 2;
-   build(L, M, 2 * idx, freeBlocks);
-   build(M + 1, R, 2 * idx + 1, freeBlocks);
-
-   freeSpace[idx] = max(freeSpace[2 * idx], freeSpace[2 * idx + 1]);
-}
-
-void upd(const int p, const int remSpace, const int L, const int R, const int idx) {
-   if (L == R) {
-      int filledSpace = freeSpace[idx] - remSpace;
-      startPos[idx] += filledSpace;
-      freeSpace[idx] = remSpace;
-      return;
-   }
-   int M = (L + R) / 2;
-   if (p <= M) {
-      upd(p, remSpace, L, M, 2 * idx);
-   }
-   else {
-      upd(p, remSpace, M + 1, R, 2 * idx + 1);
-   }
-   freeSpace[idx] = max(freeSpace[2 * idx], freeSpace[2 * idx + 1]);
-}
-
-tuple<int, int, int> query(const int reqSpace, const int L, const int R, const int idx) {
-   if (freeSpace[idx] < reqSpace) {
-      return {-1, -1, -1};
-   }
-   if (L == R) {
-      return {startPos[idx], freeSpace[idx], L};
-   }
-   if (freeSpace[2 * idx] >= reqSpace) {
-      return query(reqSpace, L, (L + R) / 2, 2 * idx);
-   }
-   else {
-      return query(reqSpace, (L + R) / 2 + 1, R, 2 * idx + 1);
-   }
-}
 
 void buildSegmentTree() {
    vector<pair<int, int>> freeBlocks;
-
    int idx = 0;
-   while (idx < int(fileSystem.size())) {
+   while (idx < (int)fileSystem.size()) {
       if (fileSystem[idx] == -1) {
          int totFree = 0;
          int st = idx;
-         while (idx < int(fileSystem.size()) && fileSystem[idx] == -1) {
+         while (idx < (int)fileSystem.size() && fileSystem[idx] == -1) {
             totFree++;
             idx++;
          }
@@ -72,39 +27,79 @@ void buildSegmentTree() {
       }
    }
 
-   treeSize = int(freeBlocks.size());
+   treeSize = (int)freeBlocks.size();
+   if (treeSize == 0) return;
+   base = 1;
+   while (base < treeSize) base <<= 1;
 
-   freeSpace.assign(4 * treeSize, 0);
-   startPos.assign(4 * treeSize, 0);
+   freeSpace.assign(2 * base, 0);
+   startPos.assign(2 * base, 0);
 
-   build(0, treeSize - 1, 1, freeBlocks);
+   for (int i = 0; i < treeSize; i++) {
+      freeSpace[base + i] = freeBlocks[i].second;
+      startPos[base + i] = freeBlocks[i].first;
+   }
+
+   for (int i = treeSize; i < base; i++) {
+      freeSpace[base + i] = 0;
+      startPos[base + i] = 0;
+   }
+
+   for (int i = base - 1; i > 0; i--) {
+      freeSpace[i] = max(freeSpace[i << 1], freeSpace[i << 1 | 1]);
+   }
+}
+
+void upd(int p, int remSpace) {
+   p += base;
+   int filled = freeSpace[p] - remSpace;
+   startPos[p] += filled;
+   freeSpace[p] = remSpace;
+   p >>= 1;
+   while (p > 0) {
+      freeSpace[p] = max(freeSpace[p << 1], freeSpace[p << 1 | 1]);
+      p >>= 1;
+   }
+}
+
+tuple<int, int, int> query(int reqSpace) {
+   if (freeSpace[1] < reqSpace) return {-1, -1, -1};
+   int idx = 1;
+   int L = 0, R = base - 1;
+   while (L != R) {
+      int M = (L + R) >> 1;
+      if (freeSpace[idx << 1] >= reqSpace) {
+         idx = idx << 1;
+         R = M;
+      }
+      else {
+         idx = idx << 1 | 1;
+         L = M + 1;
+      }
+   }
+   return {startPos[idx], freeSpace[idx], L};
 }
 
 void moveFileBlocks() {
-   int idx = int(fileSystem.size()) - 1;
+   if (treeSize == 0) return;
+   int idx = (int)fileSystem.size() - 1;
    while (idx >= 0) {
       if (fileSystem[idx] != -1) {
          int fileEndIdx = idx;
-         while (idx >= 0 && fileSystem[idx] == fileSystem[fileEndIdx]) {
-            idx--;
-         }
+         while (idx >= 0 && fileSystem[idx] == fileSystem[fileEndIdx]) idx--;
          int fileStartIdx = idx + 1;
-
          int reqSpace = fileEndIdx - fileStartIdx + 1;
-         auto res = query(reqSpace, 0, treeSize - 1, 1);
-
+         auto res = query(reqSpace);
          int blockStartIdx = get<0>(res);
          int blockSize = get<1>(res);
          int blockIdx = get<2>(res);
-
          if (blockStartIdx != -1 && blockStartIdx < fileStartIdx) {
             int itr = 0;
             for (int i = fileStartIdx; i <= fileEndIdx; i++) {
                swap(fileSystem[i], fileSystem[blockStartIdx + itr]);
                itr++;
             }
-            int newRemainingSpace = blockSize - reqSpace;
-            upd(blockIdx, newRemainingSpace, 0, treeSize - 1, 1);
+            upd(blockIdx, blockSize - reqSpace);
          }
       }
       else {
@@ -119,7 +114,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("in.txt", "r", stdin);
+   freopen("aoc-2024-day-09-challenge-3.txt", "r", stdin);
 
    string line;
    getline(cin, line);
