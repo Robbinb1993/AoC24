@@ -3,6 +3,7 @@
 using namespace std;
 using namespace chrono;
 
+vector<int> fileSystem;
 vector<pair<int, int>> freeBlocks;
 vector<int> freeSpace, startPos;
 
@@ -51,34 +52,13 @@ tuple<int, int, int> query(const int reqSpace, const int L, const int R, const i
    }
 }
 
-int main() {
-   ios_base::sync_with_stdio(false);
-   cin.tie(NULL);
-
-   auto start = high_resolution_clock::now();
-
-   freopen("in.txt", "r", stdin);
-
-   string line;
-   getline(cin, line);
-
-   vector<int> M;
-   int id = 0;
-
-   for (int i = 0; i < int(line.size()); i++) {
-      int v = line[i] - '0';
-      for (int j = 0; j < v; j++) {
-         M.push_back(i % 2 == 0 ? id : -1);
-      }
-      id += (i % 2 == 0);
-   }
-
+void buildSegmentTree() {
    int idx = 0;
-   while (idx < int(M.size())) {
-      if (M[idx] == -1) {
+   while (idx < int(fileSystem.size())) {
+      if (fileSystem[idx] == -1) {
          int totFree = 0;
          int st = idx;
-         while (idx < int(M.size()) && M[idx] == -1) {
+         while (idx < int(fileSystem.size()) && fileSystem[idx] == -1) {
             totFree++;
             idx++;
          }
@@ -93,12 +73,14 @@ int main() {
    startPos.assign(4 * int(freeBlocks.size()), 0);
 
    build(0, int(freeBlocks.size()) - 1, 1);
+}
 
-   idx = int(M.size()) - 1;
+void moveFileBlocks() {
+   int idx = int(fileSystem.size()) - 1;
    while (idx >= 0) {
-      if (M[idx] != -1) {
+      if (fileSystem[idx] != -1) {
          int fileEndIdx = idx;
-         while (idx >= 0 && M[idx] == M[fileEndIdx]) {
+         while (idx >= 0 && fileSystem[idx] == fileSystem[fileEndIdx]) {
             idx--;
          }
          int fileStartIdx = idx + 1;
@@ -106,14 +88,14 @@ int main() {
          int reqSpace = fileEndIdx - fileStartIdx + 1;
          auto res = query(reqSpace, 0, int(freeBlocks.size()) - 1, 1);
 
-         int blockStartPos = get<0>(res);
+         int blockStartIdx = get<0>(res);
          int blockSize = get<1>(res);
          int blockIdx = get<2>(res);
 
-         if (blockStartPos != -1 && blockStartPos < fileStartIdx) {
+         if (blockStartIdx != -1 && blockStartIdx < fileStartIdx) {
             int itr = 0;
             for (int i = fileStartIdx; i <= fileEndIdx; i++) {
-               swap(M[i], M[blockStartPos + itr]);
+               swap(fileSystem[i], fileSystem[blockStartIdx + itr]);
                itr++;
             }
             int newRemainingSpace = blockSize - reqSpace;
@@ -124,12 +106,36 @@ int main() {
          idx--;
       }
    }
+}
+
+int main() {
+   ios_base::sync_with_stdio(false);
+   cin.tie(NULL);
+
+   auto start = high_resolution_clock::now();
+
+   freopen("in.txt", "r", stdin);
+
+   string line;
+   getline(cin, line);
+
+
+   int id = 0;
+   for (int i = 0; i < int(line.size()); i++) {
+      int v = line[i] - '0';
+      for (int j = 0; j < v; j++) {
+         fileSystem.push_back(i % 2 == 0 ? id : -1);
+      }
+      id += (i % 2 == 0);
+   }
+
+   buildSegmentTree();
+   moveFileBlocks();
 
    long long ans = 0;
-
-   for (int i = 0; i < int(M.size()); i++) {
-      if (M[i] != -1) {
-         ans += i * M[i];
+   for (int i = 0; i < int(fileSystem.size()); i++) {
+      if (fileSystem[i] != -1) {
+         ans += i * fileSystem[i];
       }
    }
 
