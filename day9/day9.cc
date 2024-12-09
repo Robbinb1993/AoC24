@@ -4,18 +4,19 @@ using namespace std;
 using namespace chrono;
 
 vector<int> fileSystem;
-vector<pair<int, int>> freeBlocks;
+
+int treeSize;
 vector<int> freeSpace, startPos;
 
-void build(const int L, const int R, const int idx) {
+void build(const int L, const int R, const int idx, const vector<pair<int, int>>& freeBlocks) {
    if (L == R) {
       freeSpace[idx] = freeBlocks[L].second;
       startPos[idx] = freeBlocks[L].first;
       return;
    }
    int M = (L + R) / 2;
-   build(L, M, 2 * idx);
-   build(M + 1, R, 2 * idx + 1);
+   build(L, M, 2 * idx, freeBlocks);
+   build(M + 1, R, 2 * idx + 1, freeBlocks);
 
    freeSpace[idx] = max(freeSpace[2 * idx], freeSpace[2 * idx + 1]);
 }
@@ -53,6 +54,8 @@ tuple<int, int, int> query(const int reqSpace, const int L, const int R, const i
 }
 
 void buildSegmentTree() {
+   vector<pair<int, int>> freeBlocks;
+
    int idx = 0;
    while (idx < int(fileSystem.size())) {
       if (fileSystem[idx] == -1) {
@@ -69,10 +72,12 @@ void buildSegmentTree() {
       }
    }
 
-   freeSpace.assign(4 * int(freeBlocks.size()), 0);
-   startPos.assign(4 * int(freeBlocks.size()), 0);
+   treeSize = int(freeBlocks.size());
 
-   build(0, int(freeBlocks.size()) - 1, 1);
+   freeSpace.assign(4 * treeSize, 0);
+   startPos.assign(4 * treeSize, 0);
+
+   build(0, treeSize - 1, 1, freeBlocks);
 }
 
 void moveFileBlocks() {
@@ -86,7 +91,7 @@ void moveFileBlocks() {
          int fileStartIdx = idx + 1;
 
          int reqSpace = fileEndIdx - fileStartIdx + 1;
-         auto res = query(reqSpace, 0, int(freeBlocks.size()) - 1, 1);
+         auto res = query(reqSpace, 0, treeSize - 1, 1);
 
          int blockStartIdx = get<0>(res);
          int blockSize = get<1>(res);
@@ -99,7 +104,7 @@ void moveFileBlocks() {
                itr++;
             }
             int newRemainingSpace = blockSize - reqSpace;
-            upd(blockIdx, newRemainingSpace, 0, int(freeBlocks.size()) - 1, 1);
+            upd(blockIdx, newRemainingSpace, 0, treeSize - 1, 1);
          }
       }
       else {
