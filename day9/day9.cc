@@ -122,7 +122,6 @@ void printInt128(__int128 value) {
    cout << result << endl;
 }
 
-
 __int128 solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
    int l = 0, r = (int)fileSystem.size() - 1;
