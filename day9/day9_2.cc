@@ -56,13 +56,13 @@ long long solvePart2() {
          int reqSpace = fileEndIdx - fileStartIdx + 1;
 
          int mnPos = INT_MAX;
-         int mnSpace = INT_MAX;
+         int freeBlockSpace = INT_MAX;
          for (int i = reqSpace; i <= 9; i++) {
             if (!freeBlocks[i].empty()) {
                int pos = freeBlocks[i].top();
                if (pos < fileStartIdx && pos < mnPos) {
                   mnPos = pos;
-                  mnSpace = i;
+                  freeBlockSpace = i;
                }
             }
          }
@@ -77,8 +77,8 @@ long long solvePart2() {
                swap(fileSystem[i], fileSystem[blockStartIdx + itr]);
                itr++;
             }
-            int remSpace = mnSpace - reqSpace;
-            freeBlocks[mnSpace].pop();
+            int remSpace = freeBlockSpace - reqSpace;
+            freeBlocks[freeBlockSpace].pop();
             if (remSpace > 0) {
                freeBlocks[remSpace].push(blockStartIdx + reqSpace);
             }
@@ -104,7 +104,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-09-challenge-3.txt", "r", stdin);
+   freopen("aoc-2024-day-09-challenge-2.txt", "r", stdin);
 
    string line;
    getline(cin, line);
