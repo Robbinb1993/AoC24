@@ -67,18 +67,10 @@ int main() {
 
    for (int i = 0; i < int(line.size()); i++) {
       int v = line[i] - '0';
-
-      if (i % 2 == 0) {
-         for (int j = 0; j < v; j++) {
-            M.push_back(id);
-         }
-         id++;
+      for (int j = 0; j < v; j++) {
+         M.push_back(i % 2 == 0 ? id : -1);
       }
-      else {
-         for (int j = 0; j < v; j++) {
-            M.push_back(-1);
-         }
-      }
+      id += (i % 2 == 0);
    }
 
    int idx = 0;
