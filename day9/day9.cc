@@ -108,7 +108,7 @@ void moveFileBlocks() {
    }
 }
 
-long long solvePart1() {
+__int128 solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
    int l = 0, r = (int)fileSystem.size() - 1;
    while (l <= r) {
@@ -118,13 +118,27 @@ long long solvePart1() {
       if (fileSystemCopy[r] == -1) r--;
       if (fileSystemCopy[l] != -1) l++;
    }
-   long long ans = 0;
+   __int128 ans = 0;
    for (int i = 0; i < (int)fileSystemCopy.size(); i++) {
       if (fileSystemCopy[i] != -1) {
-         ans += (long long)i * fileSystemCopy[i];
+         ans += (__int128)i * (__int128)fileSystemCopy[i];
       }
    }
    return ans;
+}
+
+void print128(__int128 x) {
+   if (x == 0) {
+      cout << "0";
+      return;
+   }
+   string s = "";
+   while (x > 0) {
+      s += (char)(x % 10 + '0');
+      x /= 10;
+   }
+   reverse(s.begin(), s.end());
+   cout << s << endl;
 }
 
 int main() {
@@ -147,20 +161,25 @@ int main() {
       id += (i % 2 == 0);
    }
 
-   long long ansPart1 = solvePart1();
+   __int128 ansPart1 = solvePart1();
 
    buildSegmentTree();
    moveFileBlocks();
 
-   long long ansPart2 = 0;
+   __int128 ansPart2 = 0;
    for (int i = 0; i < int(fileSystem.size()); i++) {
       if (fileSystem[i] != -1) {
-         ansPart2 += (long long)i * fileSystem[i];
+         ansPart2 += (__int128)i * (__int128)fileSystem[i];
       }
    }
 
-   cout << "Part 1: " << ansPart1 << endl;
-   cout << "Part 2: " << ansPart2 << endl;
+   cout << "Part 1: ";
+   print128(ansPart1);
+   cout << endl;
+
+   cout << "Part 2: ";
+   print128(ansPart2);
+   cout << endl;
 
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
