@@ -108,21 +108,7 @@ void moveFileBlocks() {
    }
 }
 
-void printInt128(__int128 value) {
-   if (value == 0) {
-      cout << "0";
-      return;
-   }
-   string result;
-   while (value > 0) {
-      result += '0' + (value % 10);
-      value /= 10;
-   }
-   reverse(result.begin(), result.end());
-   cout << result << endl;
-}
-
-__int128 solvePart1() {
+long long solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
    int l = 0, r = (int)fileSystem.size() - 1;
    while (l <= r) {
@@ -132,10 +118,10 @@ __int128 solvePart1() {
       if (fileSystemCopy[r] == -1) r--;
       if (fileSystemCopy[l] != -1) l++;
    }
-   __int128 ans = 0;
+   long long ans = 0;
    for (int i = 0; i < (int)fileSystemCopy.size(); i++) {
       if (fileSystemCopy[i] != -1) {
-         ans += __int128(i) * __int128(fileSystemCopy[i]);
+         ans += (long long)i * fileSystemCopy[i];
       }
    }
    return ans;
@@ -147,7 +133,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-09-challenge-3.txt", "r", stdin);
+   freopen("aoc-2024-day-09-challenge-1.txt", "r", stdin);
 
    string line;
    getline(cin, line);
@@ -161,20 +147,20 @@ int main() {
       id += (i % 2 == 0);
    }
 
-   __int128 ansPart1 = solvePart1();
+   long long ansPart1 = solvePart1();
 
    buildSegmentTree();
    moveFileBlocks();
 
-   __int128 ansPart2 = 0;
+   long long ansPart2 = 0;
    for (int i = 0; i < int(fileSystem.size()); i++) {
       if (fileSystem[i] != -1) {
-         ansPart2 += __int128(i) * __int128(fileSystem[i]);
+         ansPart2 += (long long)i * fileSystem[i];
       }
    }
 
-   printInt128(ansPart1);
-   printInt128(ansPart2);
+   cout << "Part 1: " << ansPart1 << endl;
+   cout << "Part 2: " << ansPart2 << endl;
 
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
