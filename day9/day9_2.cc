@@ -4,7 +4,7 @@ using namespace std;
 using namespace chrono;
 
 vector<int> fileSystem;
-set<int> freeBlocks[10];
+priority_queue<int, vector<int>, greater<int>> freeBlocks[10];
 
 long long solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
@@ -35,7 +35,7 @@ void initFreeBlocks() {
             totFree++;
             idx++;
          }
-         freeBlocks[totFree].insert(st);
+         freeBlocks[totFree].push(st);
       }
       else {
          idx++;
@@ -59,7 +59,7 @@ long long solvePart2() {
          int mnSpace = INT_MAX;
          for (int i = reqSpace; i <= 9; i++) {
             if (!freeBlocks[i].empty()) {
-               int pos = *freeBlocks[i].begin();
+               int pos = freeBlocks[i].top();
                if (pos < fileStartIdx && pos < mnPos) {
                   mnPos = pos;
                   mnSpace = i;
@@ -78,9 +78,9 @@ long long solvePart2() {
                itr++;
             }
             int remSpace = mnSpace - reqSpace;
-            freeBlocks[mnSpace].erase(blockStartIdx);
+            freeBlocks[mnSpace].pop();
             if (remSpace > 0) {
-               freeBlocks[remSpace].insert(blockStartIdx + reqSpace);
+               freeBlocks[remSpace].push(blockStartIdx + reqSpace);
             }
          }
       }
