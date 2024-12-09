@@ -123,7 +123,6 @@ int main() {
             int remSpace = res.second.first - reqSpace;
             upd(res.second.second, remSpace, 0, int(freeBlocks.size()) - 1, 1);
          }
-
       }
       else {
          idx--;
