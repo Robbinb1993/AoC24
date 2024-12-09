@@ -56,7 +56,7 @@ long long solvePart2() {
          int reqSpace = fileEndIdx - fileStartIdx + 1;
 
          int mnPos = INT_MAX;
-         int freeBlockSpace = INT_MAX;
+         int freeBlockSpace = 0;
          for (int i = reqSpace; i <= 9; i++) {
             if (!freeBlocks[i].empty()) {
                int pos = freeBlocks[i].top();
