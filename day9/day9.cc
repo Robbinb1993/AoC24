@@ -108,6 +108,40 @@ void moveFileBlocks() {
    }
 }
 
+void printInt128(__int128 value) {
+   if (value == 0) {
+      cout << "0";
+      return;
+   }
+   string result;
+   while (value > 0) {
+      result += '0' + (value % 10);
+      value /= 10;
+   }
+   reverse(result.begin(), result.end());
+   cout << result << endl;
+}
+
+
+__int128 solvePart1() {
+   vector<int> fileSystemCopy = fileSystem;
+   int l = 0, r = (int)fileSystem.size() - 1;
+   while (l <= r) {
+      if (fileSystemCopy[r] != -1 && fileSystemCopy[l] == -1) {
+         swap(fileSystemCopy[l], fileSystemCopy[r]);
+      }
+      if (fileSystemCopy[r] == -1) r--;
+      if (fileSystemCopy[l] != -1) l++;
+   }
+   __int128 ans = 0;
+   for (int i = 0; i < (int)fileSystemCopy.size(); i++) {
+      if (fileSystemCopy[i] != -1) {
+         ans += __int128(i) * __int128(fileSystemCopy[i]);
+      }
+   }
+   return ans;
+}
+
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
@@ -119,7 +153,6 @@ int main() {
    string line;
    getline(cin, line);
 
-
    int id = 0;
    for (int i = 0; i < int(line.size()); i++) {
       int v = line[i] - '0';
@@ -129,20 +162,24 @@ int main() {
       id += (i % 2 == 0);
    }
 
+   __int128 ansPart1 = solvePart1();
+
    buildSegmentTree();
    moveFileBlocks();
 
-   long long ans = 0;
+   __int128 ansPart2 = 0;
    for (int i = 0; i < int(fileSystem.size()); i++) {
       if (fileSystem[i] != -1) {
-         ans += i * fileSystem[i];
+         ansPart2 += __int128(i) * __int128(fileSystem[i]);
       }
    }
+
+   printInt128(ansPart1);
+   printInt128(ansPart2);
 
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
 
-   cout << ans << endl;
    cout << "Time taken: " << duration.count() << " milliseconds" << endl;
 
    return 0;
