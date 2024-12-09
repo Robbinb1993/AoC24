@@ -6,7 +6,7 @@ using namespace chrono;
 vector<int> fileSystem;
 priority_queue<int, vector<int>, greater<int>> freeBlocks[10];
 
-long long solvePart1() {
+__int128 solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
    int l = 0, r = (int)fileSystem.size() - 1;
    while (l <= r) {
@@ -16,10 +16,10 @@ long long solvePart1() {
       if (fileSystemCopy[r] == -1) r--;
       if (fileSystemCopy[l] != -1) l++;
    }
-   long long ans = 0;
+   __int128 ans = 0;
    for (int i = 0; i < (int)fileSystemCopy.size(); i++) {
       if (fileSystemCopy[i] != -1) {
-         ans += (long long)i * fileSystemCopy[i];
+         ans += (__int128)i * (__int128)fileSystemCopy[i];
       }
    }
    return ans;
@@ -43,9 +43,9 @@ void initFreeBlocks() {
    }
 }
 
-long long solvePart2() {
+__int128 solvePart2() {
    initFreeBlocks();
-   long long ans = 0;
+   __int128 ans = 0;
 
    int idx = (int)fileSystem.size() - 1;
    while (idx >= 0) {
@@ -91,11 +91,25 @@ long long solvePart2() {
 
    for (int i = 0; i < (int)fileSystem.size(); i++) {
       if (fileSystem[i] != -1) {
-         ans += (long long)i * fileSystem[i];
+         ans += (__int128)i * (__int128)fileSystem[i];
       }
    }
 
    return ans;
+}
+
+void print128(__int128 x) {
+   if (x == 0) {
+      cout << "0";
+      return;
+   }
+   string s = "";
+   while (x > 0) {
+      s += (char)(x % 10 + '0');
+      x /= 10;
+   }
+   reverse(s.begin(), s.end());
+   cout << s << endl;
 }
 
 int main() {
@@ -104,7 +118,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-09-challenge-2.txt", "r", stdin);
+   freopen("aoc-2024-day-09-challenge-3.txt", "r", stdin);
 
    string line;
    getline(cin, line);
@@ -118,11 +132,11 @@ int main() {
       id += (i % 2 == 0);
    }
 
-   long long ansPart1 = solvePart1();
-   long long ansPart2 = solvePart2();
+   __int128 ansPart1 = solvePart1();
+   __int128 ansPart2 = solvePart2();
 
-   cout << "Part 1: " << ansPart1 << endl;
-   cout << "Part 2: " << ansPart2 << endl;
+   print128(ansPart1);
+   print128(ansPart2);
 
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
