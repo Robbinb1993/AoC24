@@ -5,12 +5,11 @@ using namespace chrono;
 
 const int MAXN = 200000;
 const int MAXV = 1000000;
-const int OFFSET = 3;
 const int IS_INCREASING = 0;
 const int IS_DECREASING = 1;
 
 int nxt[MAXV + 1];
-int seen[MAXV + OFFSET + 1];
+int seen[MAXV + 1];
 int DP[2][MAXN + 1];
 
 int main() {
@@ -43,7 +42,7 @@ int main() {
 
             for (int j = 1; j <= 3; j++) {
                int v = numbers[i] + (dir ? -j : j);
-               if (seen[v + OFFSET] == runItr) {
+               if (v >= 0 && seen[v] == runItr) {
                   int dist = nxt[v] - i;
                   int totElementsInBetween = dist - 1;
                   best = min(best, totElementsInBetween + DP[dir][nxt[v]]);
@@ -54,7 +53,7 @@ int main() {
 
          ans = min(ans, i + min(DP[IS_INCREASING][i], DP[IS_DECREASING][i]));
          nxt[numbers[i]] = i;
-         seen[numbers[i] + OFFSET] = runItr;
+         seen[numbers[i]] = runItr;
       }
 
       totAns += ans;
