@@ -25,7 +25,6 @@ int main() {
    string line;
    while (getline(cin, line)) {
       stringstream ss(line);
-      string token;
       vector<int> numbers;
 
       int v;
