@@ -5,7 +5,9 @@ using namespace chrono;
 
 vector<int> fileSystem;
 const int MAX_FREE_SLOTS = 9;
-int nextFree[MAX_FREE_SLOTS + 1];
+int freeSegmentIdx = 0;
+vector<int> freeSegmentStart, freeSegmentEnd;
+vector<int> freeSegments[MAX_FREE_SLOTS + 1];
 
 __int128 solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
@@ -26,86 +28,43 @@ __int128 solvePart1() {
    return ans;
 }
 
-void initFreeBlocks() {
+void preprocessPart2() {
+   size_t maxSegments = fileSystem.size() / 2;
+
+   freeSegmentStart.reserve(maxSegments);
+   freeSegmentEnd.reserve(maxSegments);
+
    for (int i = 1; i <= MAX_FREE_SLOTS; i++) {
-      nextFree[i] = INT_MAX;
+      freeSegments[i].reserve(maxSegments);
    }
 
-   int idx = 0;
-   while (idx < (int)fileSystem.size()) {
+   int idx = (int)fileSystem.size() - 1;
+   while (idx >= 0) {
       if (fileSystem[idx] == -1) {
          int totFree = 0;
-         int st = idx;
-         while (idx < (int)fileSystem.size() && fileSystem[idx] == -1) {
+         int ed = idx;
+         while (idx >= 0 && fileSystem[idx] == -1) {
             totFree++;
-            idx++;
+            idx--;
          }
+         int st = idx + 1;
+
+         freeSegmentStart.push_back(st);
+         freeSegmentEnd.push_back(ed);
+
          for (int i = 1; i <= totFree; i++) {
-            nextFree[i] = min(nextFree[i], st);
+            freeSegments[i].push_back(freeSegmentIdx);
          }
-         if (totFree >= MAX_FREE_SLOTS) {
-            return;
-         }
+
+         freeSegmentIdx++;
       }
       else {
-         idx++;
+         idx--;
       }
    }
-}
-
-void findNextFreeSpace(int from, const int to, const int idx, const int until) {
-   if (nextFree[to] < idx) {
-      return;
-   }
-   for (int i = idx; i < until; i++) {
-      if (fileSystem[i] == -1) {
-         int j = i;
-         while (j < until && fileSystem[j] == -1) j++;
-         int freeSpaceSz = j - i;
-
-         for (int k = from; k <= freeSpaceSz; k++) {
-            if (nextFree[k] > i) {
-               from = k;
-               nextFree[k] = i;
-            }
-         }
-
-         if (freeSpaceSz >= to) {
-            return;
-         }
-
-         i = j;
-      }
-   }
-}
-
-void updateFreeSpace(const int idx, const int taken, const int until) {
-   int initialFreeSpace = -1;
-   for (int i = MAX_FREE_SLOTS; i >= 1; i--) {
-      if (nextFree[i] == idx) {
-         initialFreeSpace = i;
-         break;
-      }
-   }
-   assert(initialFreeSpace != -1);
-
-   int remainingSpace = initialFreeSpace - taken;
-   int from = INT_MAX;
-
-   for (int i = 1; i <= initialFreeSpace; i++) {
-      if (nextFree[i] == idx) {
-         if (from == INT_MAX) {
-            from = i;
-         }
-         nextFree[i] = INT_MAX;
-      }
-   }
-
-   findNextFreeSpace(from, initialFreeSpace, idx + taken, until);
 }
 
 __int128 solvePart2() {
-   initFreeBlocks();
    __int128 ans = 0;
 
    int idx = (int)fileSystem.size() - 1;
@@ -116,15 +75,29 @@ __int128 solvePart2() {
          int fileStartIdx = idx + 1;
          int reqSpace = fileEndIdx - fileStartIdx + 1;
 
-         if (nextFree[reqSpace] < fileStartIdx) {
-            int stFree = nextFree[reqSpace];
-            int edFree = stFree + reqSpace - 1;
-            int itr = 0;
-            for (int i = stFree; i <= edFree; i++) {
-               swap(fileSystem[i], fileSystem[fileStartIdx + itr]);
-               itr++;
+         while (!freeSegments[reqSpace].empty()) {
+            int freeSegmentIdx = freeSegments[reqSpace].back();
+            freeSegments[reqSpace].pop_back();
+
+            int freeSegmentStartIdx = freeSegmentStart[freeSegmentIdx];
+            int freeSegmentEndIdx = freeSegmentEnd[freeSegmentIdx];
+            int availableSpace = freeSegmentEndIdx - freeSegmentStartIdx + 1;
+
+            if (freeSegmentStartIdx < fileStartIdx && availableSpace >= reqSpace) {
+               for (int i = 0; i < reqSpace; i++) {
+                  fileSystem[freeSegmentStartIdx + i] = fileSystem[fileStartIdx + i];
+                  fileSystem[fileStartIdx + i] = -1;
+               }
+
+               freeSegmentStart[freeSegmentIdx] += reqSpace;
+               availableSpace -= reqSpace;
+
+               if (availableSpace >= reqSpace) {
+                  freeSegments[reqSpace].push_back(freeSegmentIdx);
+               }
+
+               break;
             }
-            updateFreeSpace(stFree, reqSpace, idx);
          }
       }
       else {
@@ -176,6 +149,7 @@ int main() {
    }
 
    __int128 ansPart1 = solvePart1();
+   preprocessPart2();
    __int128 ansPart2 = solvePart2();
 
    print128(ansPart1);
