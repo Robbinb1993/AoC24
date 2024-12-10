@@ -3,7 +3,7 @@
 using namespace std;
 using namespace chrono;
 
-vector<int> fileSystem;
+vector<int> fileSystem, jump;
 const int MAX_FREE_SLOTS = 9;
 int nextFree[MAX_FREE_SLOTS + 1];
 
@@ -26,7 +26,7 @@ __int128 solvePart1() {
    return ans;
 }
 
-void initFreeBlocks() {
+void initPart2() {
    for (int i = 1; i <= MAX_FREE_SLOTS; i++) {
       nextFree[i] = INT_MAX;
    }
@@ -44,59 +44,69 @@ void initFreeBlocks() {
             nextFree[i] = min(nextFree[i], st);
          }
          if (totFree >= MAX_FREE_SLOTS) {
-            return;
+            break;
          }
       }
       else {
          idx++;
       }
    }
+
+   jump.resize((int)fileSystem.size());
+   int lastFileEnd = INT_MAX;
+   int lastFreeSpaceEnd = INT_MAX;
+
+   for (int i = int(fileSystem.size()) - 1; i >= 0; i--) {
+      if (fileSystem[i] == -1) {
+         if (lastFreeSpaceEnd == INT_MAX) {
+            lastFreeSpaceEnd = i;
+         }
+         jump[i] = lastFreeSpaceEnd + 1;
+         lastFileEnd = INT_MAX;
+      }
+      else {
+         if (lastFileEnd == INT_MAX) {
+            lastFileEnd = i;
+         }
+         jump[i] = lastFileEnd + 1;
+         lastFreeSpaceEnd = INT_MAX;
+      }
+   }
 }
 
-void findNextFreeSpace(int from, const int to, const int idx, const int until) {
-   if (nextFree[to] < idx) {
-      return;
-   }
-   for (int i = idx; i < until; i++) {
-      if (fileSystem[i] == -1) {
-         int j = i;
-         while (j < until && fileSystem[j] == -1) j++;
-         int freeSpaceSz = j - i;
+inline void findNextFreeSpace(int from, const int to, const int idx, const int until) {
+   if (nextFree[to] < idx) return;
 
+   for (int i = idx; i < until;) {
+      if (fileSystem[i] != -1) {
+         i = jump[i];
+         continue;
+      }
+
+      int j = jump[i];
+      int freeSpaceSz = j - i;
+
+      if (freeSpaceSz >= from) {
          for (int k = from; k <= freeSpaceSz; k++) {
             if (nextFree[k] > i) {
-               from = k;
                nextFree[k] = i;
             }
          }
-
-         if (freeSpaceSz >= to) {
-            return;
-         }
-
-         i = j;
       }
+
+      if (freeSpaceSz >= to) return;
+
+      i = j;
    }
 }
 
-void updateFreeSpace(const int idx, const int taken, const int until) {
-   int initialFreeSpace = -1;
-   for (int i = MAX_FREE_SLOTS; i >= 1; i--) {
-      if (nextFree[i] == idx) {
-         initialFreeSpace = i;
-         break;
-      }
-   }
-   assert(initialFreeSpace != -1);
+inline void updateFreeSpace(const int idx, const int taken, const int until) {
+   int initialFreeSpace = jump[idx] - idx;
 
-   int remainingSpace = initialFreeSpace - taken;
    int from = INT_MAX;
-
    for (int i = 1; i <= initialFreeSpace; i++) {
       if (nextFree[i] == idx) {
-         if (from == INT_MAX) {
-            from = i;
-         }
+         if (from == INT_MAX) from = i;
          nextFree[i] = INT_MAX;
       }
    }
@@ -105,7 +115,7 @@ void updateFreeSpace(const int idx, const int taken, const int until) {
 }
 
 __int128 solvePart2() {
-   initFreeBlocks();
+   initPart2();
    __int128 ans = 0;
 
    int idx = (int)fileSystem.size() - 1;
@@ -120,11 +130,12 @@ __int128 solvePart2() {
             int stFree = nextFree[reqSpace];
             int edFree = stFree + reqSpace - 1;
             int itr = 0;
+            updateFreeSpace(stFree, reqSpace, idx);
             for (int i = stFree; i <= edFree; i++) {
                swap(fileSystem[i], fileSystem[fileStartIdx + itr]);
+               jump[i] = edFree + 1;
                itr++;
             }
-            updateFreeSpace(stFree, reqSpace, idx);
          }
       }
       else {
