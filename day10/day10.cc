@@ -11,11 +11,17 @@ vector<string> grid;
 vector<vector<int>> seen, DP;
 int runItr;
 
-int solvePart1(const int x, const  int y) {
-   if (seen[x][y] == runItr) {
-      return 0;
+int solve(const int x, const  int y, const bool isPart1) {
+   if (isPart1) {
+      if (seen[x][y] == runItr) {
+         return 0;
+      }
+      seen[x][y] = runItr;
    }
-   seen[x][y] = runItr;
+   else if (DP[x][y] != -1) {
+      return DP[x][y];
+   }
+
    if (grid[x][y] == '9') {
       return 1;
    }
@@ -25,30 +31,15 @@ int solvePart1(const int x, const  int y) {
       int nx = x + DX[i];
       int ny = y + DY[i];
       if (nx >= 0 && nx < N && ny >= 0 && ny < M && grid[nx][ny] == grid[x][y] + 1) {
-         tot += solvePart1(nx, ny);
+         tot += solve(nx, ny, isPart1);
       }
+   }
+
+   if (!isPart1) {
+      DP[x][y] = tot;
    }
 
    return tot;
-}
-
-int solvePart2(const int x, const int y) {
-   if (grid[x][y] == '9') {
-      return 1;
-   }
-   if (DP[x][y] != -1) {
-      return DP[x][y];
-   }
-   int tot = 0;
-   for (int i = 0; i < 4; i++) {
-      int nx = x + DX[i];
-      int ny = y + DY[i];
-      if (nx >= 0 && nx < N && ny >= 0 && ny < M && grid[nx][ny] == grid[x][y] + 1) {
-         tot += solvePart2(nx, ny);
-      }
-   }
-
-   return DP[x][y] = tot;
 }
 
 int main() {
@@ -75,8 +66,8 @@ int main() {
       for (int j = 0; j < M; j++) {
          if (grid[i][j] == '0') {
             runItr++;
-            ansPart1 += solvePart1(i, j);
-            ansPart2 += solvePart2(i, j);
+            ansPart1 += solve(i, j, true);
+            ansPart2 += solve(i, j, false);
          }
       }
    }
