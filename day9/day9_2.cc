@@ -25,7 +25,7 @@ __int128 solvePart1() {
    return ans;
 }
 
-void initFreeBlocks() {
+void preprocessPart2() {
    int idx = 0;
    while (idx < (int)fileSystem.size()) {
       if (fileSystem[idx] == -1) {
@@ -44,7 +44,7 @@ void initFreeBlocks() {
 }
 
 __int128 solvePart2() {
-   initFreeBlocks();
+   preprocessPart2();
    __int128 ans = 0;
 
    int idx = (int)fileSystem.size() - 1;

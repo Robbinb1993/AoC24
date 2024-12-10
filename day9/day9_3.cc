@@ -3,9 +3,11 @@
 using namespace std;
 using namespace chrono;
 
-vector<int> fileSystem, jump;
+vector<int> fileSystem;
 const int MAX_FREE_SLOTS = 9;
-int nextFree[MAX_FREE_SLOTS + 1];
+int freeSegmentIdx = 0;
+vector<int> freeSegmentStart, freeSegmentEnd;
+vector<int> freeSegments[MAX_FREE_SLOTS + 1];
 
 __int128 solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
@@ -26,96 +28,35 @@ __int128 solvePart1() {
    return ans;
 }
 
-void initPart2() {
-   for (int i = 1; i <= MAX_FREE_SLOTS; i++) {
-      nextFree[i] = INT_MAX;
-   }
-
-   int idx = 0;
-   while (idx < (int)fileSystem.size()) {
+void preprocessPart2() {
+   int idx = (int)fileSystem.size() - 1;
+   while (idx >= 0) {
       if (fileSystem[idx] == -1) {
          int totFree = 0;
-         int st = idx;
-         while (idx < (int)fileSystem.size() && fileSystem[idx] == -1) {
+         int ed = idx;
+         while (idx >= 0 && fileSystem[idx] == -1) {
             totFree++;
-            idx++;
+            idx--;
          }
+         int st = idx + 1;
+
+         freeSegmentStart.push_back(st);
+         freeSegmentEnd.push_back(ed);
+
          for (int i = 1; i <= totFree; i++) {
-            nextFree[i] = min(nextFree[i], st);
+            freeSegments[i].push_back(freeSegmentIdx);
          }
-         if (totFree >= MAX_FREE_SLOTS) {
-            break;
-         }
+
+         freeSegmentIdx++;
       }
       else {
-         idx++;
+         idx--;
       }
    }
-
-   jump.resize((int)fileSystem.size());
-   int lastFileEnd = INT_MAX;
-   int lastFreeSpaceEnd = INT_MAX;
-
-   for (int i = int(fileSystem.size()) - 1; i >= 0; i--) {
-      if (fileSystem[i] == -1) {
-         if (lastFreeSpaceEnd == INT_MAX) {
-            lastFreeSpaceEnd = i;
-         }
-         jump[i] = lastFreeSpaceEnd + 1;
-         lastFileEnd = INT_MAX;
-      }
-      else {
-         if (lastFileEnd == INT_MAX) {
-            lastFileEnd = i;
-         }
-         jump[i] = lastFileEnd + 1;
-         lastFreeSpaceEnd = INT_MAX;
-      }
-   }
-}
-
-inline void findNextFreeSpace(int from, const int to, const int idx, const int until) {
-   if (nextFree[to] < idx) return;
-
-   for (int i = idx; i < until;) {
-      if (fileSystem[i] != -1) {
-         i = jump[i];
-         continue;
-      }
-
-      int j = jump[i];
-      int freeSpaceSz = j - i;
-
-      if (freeSpaceSz >= from) {
-         for (int k = from; k <= freeSpaceSz; k++) {
-            if (nextFree[k] > i) {
-               nextFree[k] = i;
-            }
-         }
-      }
-
-      if (freeSpaceSz >= to) return;
-
-      i = j;
-   }
-}
-
-inline void updateFreeSpace(const int idx, const int taken, const int until) {
-   int initialFreeSpace = jump[idx] - idx;
-
-   int from = INT_MAX;
-   for (int i = 1; i <= initialFreeSpace; i++) {
-      if (nextFree[i] == idx) {
-         if (from == INT_MAX) from = i;
-         nextFree[i] = INT_MAX;
-      }
-   }
-
-   findNextFreeSpace(from, initialFreeSpace, idx + taken, until);
 }
 
 __int128 solvePart2() {
-   initPart2();
+   preprocessPart2();
    __int128 ans = 0;
 
    int idx = (int)fileSystem.size() - 1;
@@ -126,15 +67,27 @@ __int128 solvePart2() {
          int fileStartIdx = idx + 1;
          int reqSpace = fileEndIdx - fileStartIdx + 1;
 
-         if (nextFree[reqSpace] < fileStartIdx) {
-            int stFree = nextFree[reqSpace];
-            int edFree = stFree + reqSpace - 1;
-            int itr = 0;
-            updateFreeSpace(stFree, reqSpace, idx);
-            for (int i = stFree; i <= edFree; i++) {
-               swap(fileSystem[i], fileSystem[fileStartIdx + itr]);
-               jump[i] = edFree + 1;
-               itr++;
+         while (!freeSegments[reqSpace].empty()) {
+            int freeSegmentIdx = freeSegments[reqSpace].back();
+            freeSegments[reqSpace].pop_back();
+
+            int freeSegmentStartIdx = freeSegmentStart[freeSegmentIdx];
+            int freeSegmentEndIdx = freeSegmentEnd[freeSegmentIdx];
+            int availableSpace = freeSegmentEndIdx - freeSegmentStartIdx + 1;
+
+            if (freeSegmentStartIdx < fileStartIdx && availableSpace >= reqSpace) {
+               for (int i = 0; i < reqSpace; i++) {
+                  swap(fileSystem[freeSegmentStartIdx + i], fileSystem[fileStartIdx + i]);
+               }
+
+               freeSegmentStart[freeSegmentIdx] += reqSpace;
+               availableSpace -= reqSpace;
+
+               if (availableSpace >= reqSpace) {
+                  freeSegments[reqSpace].push_back(freeSegmentIdx);
+               }
+
+               break;
             }
          }
       }
