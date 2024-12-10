@@ -11,7 +11,7 @@ vector<string> grid;
 vector<vector<int>> seen, DP;
 int runItr;
 
-int solve(const int x, const  int y, const bool isPart1) {
+int solve(const int x, const int y, const bool isPart1) {
    if (isPart1) {
       if (seen[x][y] == runItr) {
          return 0;
