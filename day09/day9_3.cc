@@ -28,9 +28,7 @@ __int128 solvePart1() {
    return ans;
 }
 
-void preprocessPart2() {
-   size_t maxSegments = fileSystem.size() / 2;
-
+void preprocessPart2(const int maxSegments) {
    freeSegmentStart.reserve(maxSegments);
    freeSegmentEnd.reserve(maxSegments);
 
@@ -149,7 +147,7 @@ int main() {
    }
 
    __int128 ansPart1 = solvePart1();
-   preprocessPart2();
+   preprocessPart2(int(line.size()) / 2);
    __int128 ansPart2 = solvePart2();
 
    print128(ansPart1);
