@@ -29,6 +29,15 @@ __int128 solvePart1() {
 }
 
 void preprocessPart2() {
+   size_t maxSegments = fileSystem.size() / 2;
+
+   freeSegmentStart.reserve(maxSegments);
+   freeSegmentEnd.reserve(maxSegments);
+
+   for (int i = 1; i <= MAX_FREE_SLOTS; i++) {
+      freeSegments[i].reserve(maxSegments);
+   }
+
    int idx = (int)fileSystem.size() - 1;
    while (idx >= 0) {
       if (fileSystem[idx] == -1) {
@@ -56,7 +65,6 @@ void preprocessPart2() {
 }
 
 __int128 solvePart2() {
-   preprocessPart2();
    __int128 ans = 0;
 
    int idx = (int)fileSystem.size() - 1;
@@ -77,7 +85,8 @@ __int128 solvePart2() {
 
             if (freeSegmentStartIdx < fileStartIdx && availableSpace >= reqSpace) {
                for (int i = 0; i < reqSpace; i++) {
-                  swap(fileSystem[freeSegmentStartIdx + i], fileSystem[fileStartIdx + i]);
+                  fileSystem[freeSegmentStartIdx + i] = fileSystem[fileStartIdx + i];
+                  fileSystem[fileStartIdx + i] = -1;
                }
 
                freeSegmentStart[freeSegmentIdx] += reqSpace;
@@ -140,6 +149,7 @@ int main() {
    }
 
    __int128 ansPart1 = solvePart1();
+   preprocessPart2();
    __int128 ansPart2 = solvePart2();
 
    print128(ansPart1);
