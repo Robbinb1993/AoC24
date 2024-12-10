@@ -29,6 +29,7 @@ __int128 solvePart1() {
 }
 
 void preprocessPart2(const int maxSegments) {
+
    freeSegmentStart.reserve(maxSegments);
    freeSegmentEnd.reserve(maxSegments);
 

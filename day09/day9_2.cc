@@ -3,8 +3,9 @@
 using namespace std;
 using namespace chrono;
 
+const int MAX_SEGMENT_SIZE = 9;
 vector<int> fileSystem;
-priority_queue<int, vector<int>, greater<int>> freeBlocks[10];
+priority_queue<int, vector<int>, greater<int>> freeBlocks[MAX_SEGMENT_SIZE + 1];
 
 __int128 solvePart1() {
    vector<int> fileSystemCopy = fileSystem;
@@ -57,7 +58,7 @@ __int128 solvePart2() {
 
          int mnPos = INT_MAX;
          int freeBlockSpace = 0;
-         for (int i = reqSpace; i <= 9; i++) {
+         for (int i = reqSpace; i <= MAX_SEGMENT_SIZE; i++) {
             if (!freeBlocks[i].empty()) {
                int pos = freeBlocks[i].top();
                if (pos < fileStartIdx && pos < mnPos) {
