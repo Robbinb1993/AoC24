@@ -37,7 +37,7 @@ __int128 solve(long long stoneVal, int remSteps) {
    else {
       long long numDigits = (stoneVal <= MAXD) ? precomputedDigits[stoneVal] : log10(stoneVal) + 1;
 
-      if (numDigits % 2 == 0) {
+      if (!(numDigits & 1)) {
          long long halfDigits = numDigits / 2;
          long long divisor = powersOf10[halfDigits];
 
@@ -89,7 +89,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("in.txt", "r", stdin);
+   freopen("day11-big.txt", "r", stdin);
 
    memset(DP, -1, sizeof(DP));
 
