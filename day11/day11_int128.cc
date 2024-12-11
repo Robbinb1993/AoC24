@@ -3,15 +3,16 @@
 using namespace std;
 using namespace chrono;
 
-const int MAXV = 100000;
+const int MAXV = 1000;
 const int MAXSTEPS = 75;
 __int128 DP[MAXV + 1][MAXSTEPS + 1];
 
-vector<int> precomputedDigits(MAXV + 1);
+const int MAXD = 100000;
+vector<int> precomputedDigits(MAXD + 1);
 vector<long long> powersOf10;
 
 void precompute() {
-   for (int i = 1; i <= MAXV; ++i) {
+   for (int i = 1; i <= MAXD; ++i) {
       precomputedDigits[i] = log10(i) + 1;
    }
    for (int i = 0; i <= 19; ++i) { // 10^19 covers __int128 range
@@ -33,7 +34,7 @@ __int128 solve(long long stoneVal, int remSteps) {
       tot = solve(1, remSteps - 1);
    }
    else {
-      long long numDigits = (stoneVal <= MAXV) ? precomputedDigits[stoneVal] : log10(stoneVal) + 1;
+      long long numDigits = (stoneVal <= MAXD) ? precomputedDigits[stoneVal] : log10(stoneVal) + 1;
 
       if (numDigits % 2 == 0) {
          long long halfDigits = numDigits / 2;
