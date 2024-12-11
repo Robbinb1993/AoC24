@@ -7,38 +7,38 @@ const int MAXV = 1000;
 const int MAXSTEPS = 75;
 long long DP[MAXV + 1][MAXSTEPS + 1];
 
-long long solve(long long stone, int remSteps) {
+long long solve(long long stoneVal, int remSteps) {
    if (remSteps == 0) {
       return 1;
    }
 
-   if (stone <= MAXV && DP[stone][remSteps] != -1) {
-      return DP[stone][remSteps];
+   if (stoneVal <= MAXV && DP[stoneVal][remSteps] != -1) {
+      return DP[stoneVal][remSteps];
    }
 
    long long tot = 0;
-   if (stone == 0) {
+   if (stoneVal == 0) {
       tot = solve(1, remSteps - 1);
    }
    else {
-      long long numDigits = log10(stone) + 1;
+      long long numDigits = log10(stoneVal) + 1;
       if (numDigits % 2 == 0) {
          long long halfDigits = numDigits / 2;
          long long divisor = pow(10, halfDigits);
 
-         long long leftPart = stone / divisor;
-         long long rightPart = stone % divisor;
+         long long leftPart = stoneVal / divisor;
+         long long rightPart = stoneVal % divisor;
 
          tot += solve(leftPart, remSteps - 1);
          tot += solve(rightPart, remSteps - 1);
       }
       else {
-         tot = solve(stone * 2024, remSteps - 1);
+         tot = solve(stoneVal * 2024, remSteps - 1);
       }
    }
 
-   if (stone <= MAXV) {
-      DP[stone][remSteps] = tot;
+   if (stoneVal <= MAXV) {
+      DP[stoneVal][remSteps] = tot;
    }
 
    return tot;
