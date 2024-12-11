@@ -14,10 +14,10 @@ vector<__int128> powersOf10;
 void precompute() {
    for (int i = 1; i <= MAXD; ++i) {
       precomputedDigits[i] = log10(i) + 1;
-      powersOf10.push_back(1);
-      for (int i = 1; i <= 38; ++i) {
-         powersOf10.push_back(powersOf10.back() * 10);
-      }
+   }
+   powersOf10.push_back(1);
+   for (int i = 1; i <= 38; ++i) {
+      powersOf10.push_back(powersOf10.back() * 10);
    }
 }
 
