@@ -16,7 +16,7 @@ __int128 solve(long long stoneVal, int remSteps) {
       return DP[stoneVal][remSteps];
    }
 
-   long long tot = 0;
+   __int128 tot = 0;
    if (stoneVal == 0) {
       tot = solve(1, remSteps - 1);
    }
