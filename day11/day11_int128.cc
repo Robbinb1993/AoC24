@@ -66,7 +66,6 @@ ostream& operator<<(ostream& os, __int128 num) {
    return os;
 }
 
-
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
