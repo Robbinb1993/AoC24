@@ -78,17 +78,15 @@ int main() {
    memset(DP, -1, sizeof(DP));
 
    long long v;
-   __int128 ans1 = 0;
-   __int128 ans2 = 0;
+   __int128 ans = 0;
    while (cin >> v) {
-      ans1 += solve(v, 25);
-      ans2 += solve(v, 75);
+      ans += solve(v, 75);
    }
 
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
 
-   cout << ans1 << " " << ans2 << endl;
+   cout << ans << endl;
    cout << "Time taken: " << duration.count() << "ms" << endl;
 
    return 0;
