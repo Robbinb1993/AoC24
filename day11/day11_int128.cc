@@ -3,9 +3,21 @@
 using namespace std;
 using namespace chrono;
 
-const int MAXV = 1000;
+const int MAXV = 100000;
 const int MAXSTEPS = 75;
 __int128 DP[MAXV + 1][MAXSTEPS + 1];
+
+vector<int> precomputedDigits(MAXV + 1);
+vector<long long> powersOf10;
+
+void precompute() {
+   for (int i = 1; i <= MAXV; ++i) {
+      precomputedDigits[i] = log10(i) + 1;
+   }
+   for (int i = 0; i <= 19; ++i) { // 10^19 covers __int128 range
+      powersOf10.push_back(pow(10, i));
+   }
+}
 
 __int128 solve(long long stoneVal, int remSteps) {
    if (remSteps == 0) {
@@ -21,10 +33,11 @@ __int128 solve(long long stoneVal, int remSteps) {
       tot = solve(1, remSteps - 1);
    }
    else {
-      long long numDigits = log10(stoneVal) + 1;
+      long long numDigits = (stoneVal <= MAXV) ? precomputedDigits[stoneVal] : log10(stoneVal) + 1;
+
       if (numDigits % 2 == 0) {
          long long halfDigits = numDigits / 2;
-         long long divisor = pow(10, halfDigits);
+         long long divisor = powersOf10[halfDigits];
 
          long long leftPart = stoneVal / divisor;
          long long rightPart = stoneVal % divisor;
@@ -69,6 +82,8 @@ ostream& operator<<(ostream& os, __int128 num) {
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
+
+   precompute();
 
    auto start = high_resolution_clock::now();
 
