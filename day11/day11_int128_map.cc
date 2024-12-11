@@ -6,17 +6,7 @@ using namespace chrono;
 const int MAXSTEPS = 75;
 const int MAXD = 100000;
 
-struct PairHash {
-   template <typename T1, typename T2>
-   size_t operator()(const pair<T1, T2>& p) const {
-      size_t seed = 0;
-      seed ^= hash<T1>{}(p.first) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-      seed ^= hash<T2>{}(p.second) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-      return seed;
-   }
-};
-
-unordered_map<pair<long long, int>, __int128, PairHash> DP;
+vector<unordered_map<long long, __int128>> DP(MAXSTEPS + 1);
 vector<int> precomputedDigits(MAXD + 1);
 vector<__int128> powersOf10;
 
@@ -35,8 +25,9 @@ __int128 solve(long long stoneVal, int remSteps) {
       return 1;
    }
 
-   if (DP.find({stoneVal, remSteps}) != DP.end()) {
-      return DP[{stoneVal, remSteps}];
+   auto it = DP[remSteps].find(stoneVal);
+   if (it != DP[remSteps].end()) {
+      return it->second;
    }
 
    __int128 tot = 0;
@@ -61,7 +52,7 @@ __int128 solve(long long stoneVal, int remSteps) {
       }
    }
 
-   DP[{stoneVal, remSteps}] = tot;
+   DP[remSteps][stoneVal] = tot;
 
    return tot;
 }
