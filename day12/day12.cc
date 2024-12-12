@@ -6,17 +6,17 @@ const int DY[4] = {0, 0, 1, -1};
 
 int N, M;
 vector<vector<bool>> seen;
-vector<vector<int>> outerSeen[4];
+vector<vector<int>> lineSegmentSeen[4];
 int runItr = 0;
 vector<string> grid;
 
-bool getAndUpdOuterSeen(const int x, const int y, const int dir, const char pChar) {
+bool getAndMarkLineSegment(const int x, const int y, const int dir, const char pChar) {
    char cChar = grid[x][y];
    if (cChar == pChar) {
       return false;
    }
 
-   bool isNewLine = outerSeen[dir][x][y] != runItr;
+   bool isNewLine = lineSegmentSeen[dir][x][y] != runItr;
    if (!isNewLine) {
       return false;
    }
@@ -28,7 +28,7 @@ bool getAndUpdOuterSeen(const int x, const int y, const int dir, const char pCha
          if (grid[px][py] != pChar || grid[cx][cy] == pChar) {
             break;
          }
-         outerSeen[dir][cx][cy] = runItr;
+         lineSegmentSeen[dir][cx][cy] = runItr;
          cx += stepX;
          cy += stepY;
       }
@@ -43,7 +43,7 @@ bool getAndUpdOuterSeen(const int x, const int y, const int dir, const char pCha
       markOuterSeen(x + DX[1], y, DX[1], 0);
    }
 
-   outerSeen[dir][x][y] = runItr;
+   lineSegmentSeen[dir][x][y] = runItr;
    return isNewLine;
 }
 
@@ -51,7 +51,7 @@ pair<int, int> floodfill(const int x, const int y, const char c) {
    int sides = 0;
 
    for (int d = 0; d < 4; d++) {
-      sides += getAndUpdOuterSeen(x + DX[d], y + DY[d], d, c);
+      sides += getAndMarkLineSegment(x + DX[d], y + DY[d], d, c);
    }
 
    int area = 1;
@@ -90,7 +90,7 @@ int main() {
    seen = vector<vector<bool>>(N, vector<bool>(M, false));
 
    for (int i = 0; i < 4; i++) {
-      outerSeen[i].assign(N, vector<int>(M, 0));
+      lineSegmentSeen[i].assign(N, vector<int>(M, 0));
    }
 
    long long ans = 0;
