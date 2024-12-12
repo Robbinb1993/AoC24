@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
 const int DX[4] = {1, -1, 0, 0};
 const int DY[4] = {0, 0, 1, -1};
@@ -47,35 +49,44 @@ bool getAndMarkLineSegment(const int x, const int y, const int dir, const char p
    return isNewLine;
 }
 
-pair<int, int> floodfill(const int x, const int y, const char c) {
+tuple<int, int, int> floodfill(const int startX, const int startY, const char c) {
+   vector<pair<int, int>> stack;
+   stack.push_back({startX, startY});
+   seen[startX][startY] = true;
+
+   int area = 0;
    int sides = 0;
+   int perimeter = 0;
 
-   for (int d = 0; d < 4; d++) {
-      sides += getAndMarkLineSegment(x + DX[d], y + DY[d], d, c);
-   }
+   while (!stack.empty()) {
+      auto [x, y] = stack.back();
+      stack.pop_back();
+      area++;
 
-   int area = 1;
-   for (int i = 0; i < 4; i++) {
-      int nx = x + DX[i];
-      int ny = y + DY[i];
-      if (grid[nx][ny] == c) {
-         if (!seen[nx][ny]) {
+      for (int d = 0; d < 4; d++) {
+         int nx = x + DX[d];
+         int ny = y + DY[d];
+         if (grid[nx][ny] != c) {
+            perimeter++;
+            sides += getAndMarkLineSegment(nx, ny, d, c);
+         }
+         else if (!seen[nx][ny]) {
             seen[nx][ny] = true;
-            auto [s, a] = floodfill(nx, ny, c);
-            area += a;
-            sides += s;
+            stack.push_back({nx, ny});
          }
       }
    }
 
-   return {sides, area};
+   return {perimeter, sides, area};
 }
 
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
-   freopen("in.txt", "r", stdin);
+   auto start = high_resolution_clock::now();
+
+   freopen("combined-1.txt", "r", stdin);
    string line;
    while (getline(cin, line)) {
       grid.push_back("*" + line + "*");
@@ -87,26 +98,33 @@ int main() {
 
    N = grid.size();
    M = grid[0].size();
-   seen = vector<vector<bool>>(N, vector<bool>(M, false));
+   seen.assign(N, vector<bool>(M, false));
 
    for (int i = 0; i < 4; i++) {
       lineSegmentSeen[i].assign(N, vector<int>(M, 0));
    }
 
-   long long ans = 0;
+   long long ans1 = 0;
+   long long ans2 = 0;
 
    for (int i = 1; i < N - 1; i++) {
       for (int j = 1; j < M - 1; j++) {
          if (!seen[i][j]) {
             seen[i][j] = true;
             runItr++;
-            auto [sides, area] = floodfill(i, j, grid[i][j]);
-            ans += area * sides;
+            auto [perimeter, sides, area] = floodfill(i, j, grid[i][j]);
+            ans1 += (long long)perimeter * area;
+            ans2 += (long long)area * sides;
          }
       }
    }
 
-   cout << ans << endl;
+   auto stop = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(stop - start);
+
+   cout << ans1 << " " << ans2 << endl;
+   cout << "Time taken: "
+      << duration.count() << "ms" << endl;
 
    return 0;
 }
