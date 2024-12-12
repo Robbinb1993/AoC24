@@ -5,9 +5,9 @@ using namespace chrono;
 
 const int MAXV = 1000;
 const int MAXSTEPS = 75;
-long long DP[MAXV + 1][MAXSTEPS + 1];
+__int128 DP[MAXV + 1][MAXSTEPS + 1];
 
-long long solve(long long stoneVal, int remSteps) {
+__int128 solve(long long stoneVal, int remSteps) {
    if (remSteps == 0) {
       return 1;
    }
@@ -44,6 +44,29 @@ long long solve(long long stoneVal, int remSteps) {
    return tot;
 }
 
+ostream& operator<<(ostream& os, __int128 num) {
+   if (num == 0) {
+      os << '0';
+      return os;
+   }
+
+   bool isNegative = num < 0;
+   if (isNegative) num = -num;
+
+   string str = "";
+   while (num > 0) {
+      str += static_cast<char>('0' + (num % 10));
+      num /= 10;
+   }
+
+   if (isNegative) str += '-';
+
+   reverse(str.begin(), str.end());
+   os << str;
+   return os;
+}
+
+
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
@@ -54,8 +77,8 @@ int main() {
 
    memset(DP, -1, sizeof(DP));
 
-   int v;
-   long long ans = 0;
+   long long v;
+   __int128 ans = 0;
    while (cin >> v) {
       ans += solve(v, 75);
    }
