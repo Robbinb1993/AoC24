@@ -34,11 +34,11 @@ bool getAndUpdOuterSeen(const int x, const int y, const int dir, const char pCha
       }
       };
 
-   if (dir <= 1) { //Horizontally touching neighbour
+   if (dir <= 1) { //Vertically touching neighbours
       markOuterSeen(x, y + DY[2], 0, DY[2]);
       markOuterSeen(x, y + DY[3], 0, DY[3]);
    }
-   else { //Vertically touching neighbour
+   else { //Horizontally touching neighbours
       markOuterSeen(x + DX[0], y, DX[0], 0);
       markOuterSeen(x + DX[1], y, DX[1], 0);
    }
