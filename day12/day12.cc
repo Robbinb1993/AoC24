@@ -21,7 +21,7 @@ bool getAndMarkLineSegment(const int x, const int y, const int dir, const char p
       return false;
    }
 
-   auto markOuterSeen = [&](int cx, int cy, int stepX, int stepY) {
+   auto markLine = [&](int cx, int cy, int stepX, int stepY) {
       while (cx >= 0 && cx < N && cy >= 0 && cy < M) {
          int px = cx - DX[dir];
          int py = cy - DY[dir];
@@ -35,12 +35,12 @@ bool getAndMarkLineSegment(const int x, const int y, const int dir, const char p
       };
 
    if (dir <= 1) { //Horizontally touching neighbours
-      markOuterSeen(x, y + DY[2], 0, DY[2]);
-      markOuterSeen(x, y + DY[3], 0, DY[3]);
+      markLine(x, y + DY[2], 0, DY[2]);
+      markLine(x, y + DY[3], 0, DY[3]);
    }
    else { // Vertically touching neighbours
-      markOuterSeen(x + DX[0], y, DX[0], 0);
-      markOuterSeen(x + DX[1], y, DX[1], 0);
+      markLine(x + DX[0], y, DX[0], 0);
+      markLine(x + DX[1], y, DX[1], 0);
    }
 
    lineSegmentSeen[dir][x][y] = runItr;
