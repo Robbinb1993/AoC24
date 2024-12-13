@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include "../dsa/dsu.h"
 using namespace std;
 
 long long applyCramersRule(long long ax, long long ay, long long bx, long long by, long long px, long long py) {
@@ -22,6 +23,9 @@ long long applyCramersRule(long long ax, long long ay, long long bx, long long b
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
+
+   DSU dsu(1000000);
+
 
    freopen("in.txt", "r", stdin);
 
