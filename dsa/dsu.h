@@ -3,17 +3,17 @@
 
 #include <vector>
 #include <algorithm>
+#include <numeric>
 
 class DSU {
 private:
-   vector<int> parent, size;
+   std::vector<int> parent, size;
 
 public:
    DSU(const int N) {
       parent.assign(N, 0);
       size.assign(N, 1);
-      for (int i = 0; i < N; i++)
-         parent[i] = i;
+      std::iota(parent.begin(), parent.end(), 0);
    }
    int getSetSize(int v);
    int findSetParent(int v);
@@ -36,7 +36,7 @@ void DSU::uniteSets(int a, int b) {
    b = findSetParent(b);
    if (a != b) {
       if (size[a] < size[b])
-         swap(a, b);
+         std::swap(a, b);
       parent[b] = a;
       size[a] += size[b];
    }
