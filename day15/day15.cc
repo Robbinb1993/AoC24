@@ -18,7 +18,7 @@ bool isBoxChar(const char c) {
    return c == '[' || c == ']' || c == 'O';
 }
 
-//Used to move 1x1 blocks or the 1x2 blocks horizontally.
+//Used to move 1x1 blocks, or the 1x2 blocks horizontally.
 pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, const int ny, const int dir) {
    int ex = nx;
    int ey = ny;
