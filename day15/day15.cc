@@ -1,13 +1,12 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-bool IS_PART1 = true;
-
-int N, M;
-vector<string> grid;
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
 unordered_map<char, int> directionMap = {{'^', 0}, {'>', 1}, {'v', 2}, {'<', 3}};
+
+int N, M;
+vector<string> grid;
 vector<vector<int>> seen;
 int runItr = 0;
 
@@ -73,11 +72,11 @@ bool processMultiWidthMove(const int px, const int py, const int dir, const bool
    return true;
 }
 
-pair<int, int> move(const int px, const int py, const int dir) {
+pair<int, int> move(const int px, const int py, const int dir, const bool isPart1) {
    int nx = px + DX[dir];
    int ny = py + DY[dir];
    if (grid[nx][ny] == '#') return {px, py};
-   if (IS_PART1 || isHorizontalMove(dir)) {
+   if (isPart1 || isHorizontalMove(dir)) {
       return processSingleWidthMove(px, py, nx, ny, dir);
    }
    else {
@@ -114,7 +113,6 @@ int main() {
 
    for (int part = 1; part <= 2; part++) {
       if (part == 2) {
-         IS_PART1 = false;
          for (int l = 0; l < int(gridCopy.size()); l++) {
             string transformedLine = "";
             for (auto c : gridCopy[l]) {
@@ -143,7 +141,7 @@ int main() {
       }
 
       for (auto m : moves) {
-         pos = move(pos.first, pos.second, directionMap[m]);
+         pos = move(pos.first, pos.second, directionMap[m], part == 1);
       }
 
       long long ans = 0;
