@@ -56,7 +56,6 @@ bool processMultiWidthMove(const int px, const int py, const int dir, const bool
    int nly = ly + DY[dir];
    int nry = ry + DY[dir];
 
-   bool isRightHalfProcessed = (grid[nx][nry] == ']');
    // Check feasibility for both parts (left and right) of current [] block to be moved.
    bool canMoveLeftHalf = processMultiWidthMove(nx, nly, dir, performMove);
    bool canMoveRightHalf = processMultiWidthMove(nx, nry, dir, performMove);
