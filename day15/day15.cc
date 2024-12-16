@@ -38,33 +38,25 @@ pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, 
 }
 
 //Used to move the 1x2 blocks vertically.
-bool processMultiWidthMove(const int px, const int py, const int dir, vector<pair<int, int>>& boxes) {
-   if (seen[px][py] == runItr) return true;
-
+bool processMultiWidthMove(const int px, int py, const int dir, vector<pair<int, int>>& boxes) {
    if (grid[px][py] == '#') return false;
    if (grid[px][py] == '.') return true;
+   if (grid[px][py] == ']')
+      py--;
 
-   int ly, ry;
-   if (grid[px][py] == '[')
-      ly = py, ry = py + 1;
-   else
-      ly = py - 1, ry = py;
-
-   if (seen[px][ly] == runItr || seen[px][ry] == runItr) return true;
-   seen[px][ly] = seen[px][ry] = runItr;
+   if (seen[px][py] == runItr) return true;
+   seen[px][py] = runItr;
 
    int nx = px + DX[dir];
-   int nly = ly + DY[dir];
-   int nry = ry + DY[dir];
 
    // Check feasibility for both parts (left and right) of current [] block to be moved.
-   bool canMoveLeftHalf = processMultiWidthMove(nx, nly, dir, boxes);
-   bool canMoveRightHalf = processMultiWidthMove(nx, nry, dir, boxes);
+   bool canMoveLeftHalf = processMultiWidthMove(nx, py, dir, boxes);
+   bool canMoveRightHalf = processMultiWidthMove(nx, py + 1, dir, boxes);
 
    if (!canMoveLeftHalf || !canMoveRightHalf) return false;
 
-   boxes.emplace_back(nx, nly);
-   boxes.emplace_back(nx, nry);
+   boxes.emplace_back(nx, py);
+   boxes.emplace_back(nx, py + 1);
 
    return true;
 }
