@@ -105,7 +105,6 @@ int main() {
    }
    grid = move(tempGrid);
 
-
    auto gridCopy = grid;
 
    string moves;
@@ -135,14 +134,13 @@ int main() {
       seen.assign(N, vector<int>(M, 0));
 
       pair<int, int> pos;
-      {
-         bool found = false;
-         for (int i = 0; i < N && !found; i++) {
-            for (int j = 0; j < M && !found; j++) {
-               if (grid[i][j] == '@') {
-                  pos = {i, j};
-                  found = true;
-               }
+
+      bool found = false;
+      for (int i = 0; i < N && !found; i++) {
+         for (int j = 0; j < M && !found; j++) {
+            if (grid[i][j] == '@') {
+               pos = {i, j};
+               found = true;
             }
          }
       }
