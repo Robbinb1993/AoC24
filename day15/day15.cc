@@ -97,16 +97,14 @@ int main() {
 
    freopen("aoc-2024-day-15-challenge-4.txt", "r", stdin);
 
-   // Read grid
-   {
-      string line;
-      vector<vector<char>> tempGrid;
-      while (true) {
-         if (!std::getline(cin, line) || line.empty()) break;
-         tempGrid.emplace_back(line.begin(), line.end());
-      }
-      grid = move(tempGrid);
+   string line;
+   vector<vector<char>> tempGrid;
+   while (true) {
+      if (!std::getline(cin, line) || line.empty()) break;
+      tempGrid.emplace_back(line.begin(), line.end());
    }
+   grid = move(tempGrid);
+
 
    auto gridCopy = grid;
 
