@@ -95,7 +95,7 @@ int main() {
    directionMap['v'] = 2;
    directionMap['<'] = 3;
 
-   freopen("aoc-2024-day-15-challenge-4.txt", "r", stdin);
+   freopen("aoc-2024-day-15-challenge-2.txt", "r", stdin);
 
    string line;
    vector<vector<char>> tempGrid;
@@ -109,7 +109,6 @@ int main() {
    auto gridCopy = grid;
 
    string moves;
-   string line;
    while (std::getline(cin, line)) {
       moves += line;
    }
