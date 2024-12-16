@@ -38,9 +38,8 @@ pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, 
 }
 
 //Used to move the 1x2 blocks vertically.
-bool processMultiWidthMove(const int px, const int py, const int dir, const bool performMove) {
+bool processMultiWidthMove(const int px, const int py, const int dir, vector<pair<int, int>>& boxes) {
    if (seen[px][py] == runItr) return true;
-   seen[px][py] = runItr;
 
    if (grid[px][py] == '#') return false;
    if (grid[px][py] == '.') return true;
@@ -51,23 +50,21 @@ bool processMultiWidthMove(const int px, const int py, const int dir, const bool
    else
       ly = py - 1, ry = py;
 
+   if (seen[px][ly] == runItr || seen[px][ry] == runItr) return true;
+   seen[px][ly] = seen[px][ry] = runItr;
+
    int nx = px + DX[dir];
    int nly = ly + DY[dir];
    int nry = ry + DY[dir];
 
    // Check feasibility for both parts (left and right) of current [] block to be moved.
-   bool canMoveLeftHalf = processMultiWidthMove(nx, nly, dir, performMove);
-   bool canMoveRightHalf = processMultiWidthMove(nx, nry, dir, performMove);
+   bool canMoveLeftHalf = processMultiWidthMove(nx, nly, dir, boxes);
+   bool canMoveRightHalf = processMultiWidthMove(nx, nry, dir, boxes);
 
    if (!canMoveLeftHalf || !canMoveRightHalf) return false;
 
-   if (performMove) {
-      // Perform actual move
-      grid[nx][nly] = grid[px][ly];
-      grid[px][ly] = '.';
-      grid[nx][nry] = grid[px][ry];
-      grid[px][ry] = '.';
-   }
+   boxes.emplace_back(nx, nly);
+   boxes.emplace_back(nx, nry);
 
    return true;
 }
@@ -81,9 +78,13 @@ pair<int, int> move(const int px, const int py, const int dir, const bool isPart
    }
    else {
       runItr++;
-      if (processMultiWidthMove(nx, ny, dir, false)) {
-         runItr++;
-         processMultiWidthMove(nx, ny, dir, true);
+      vector<pair<int, int>> boxes;
+      if (processMultiWidthMove(nx, ny, dir, boxes)) {
+         for (auto [bx, by] : boxes) {
+            grid[bx][by] = grid[bx - DX[dir]][by];
+            grid[bx - DX[dir]][by] = '.';
+         }
+
          grid[nx][ny] = '@';
          grid[px][py] = '.';
          return {nx, ny};
