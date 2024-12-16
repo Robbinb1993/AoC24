@@ -1,25 +1,26 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
-const int DX[4] = {-1, 0, 1, 0};
-const int DY[4] = {0, 1, 0, -1};
-unordered_map<char, int> directionMap = {{'^', 0}, {'>', 1}, {'v', 2}, {'<', 3}};
+static const int DX[4] = {-1, 0, 1, 0};
+static const int DY[4] = {0, 1, 0, -1};
+static int directionMap[128];
+
+inline bool isHorizontalMove(const int dir) {
+   return dir == 1 || dir == 3;
+}
+
+inline bool isBoxChar(const char c) {
+   return c == '[' || c == ']' || c == 'O';
+}
 
 int N, M;
 vector<vector<char>> grid;
 vector<vector<int>> seen;
 int runItr = 0;
 
-bool isHorizontalMove(const int dir) {
-   return dir == 1 || dir == 3;
-}
-
-bool isBoxChar(const char c) {
-   return c == '[' || c == ']' || c == 'O';
-}
-
-//Used to move 1x1 blocks, or the 1x2 blocks horizontally.
-pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, const int ny, const int dir) {
+inline pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, const int ny, const int dir) {
    int ex = nx;
    int ey = ny;
    while (isBoxChar(grid[ex][ey])) {
@@ -37,11 +38,10 @@ pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, 
    return {nx, ny};
 }
 
-//Used to move the 1x2 blocks vertically.
-pair<int, int> processMultiWidthMove(const int px, const int py, const int dir) {
+inline pair<int, int> processMultiWidthMove(const int px, const int py, const int dir) {
    runItr++;
-
    vector<pair<int, int>> movedTo;
+   movedTo.reserve(2000);
    queue<pair<int, int>> Q;
    Q.emplace(px + DX[dir], py);
 
@@ -59,12 +59,11 @@ pair<int, int> processMultiWidthMove(const int px, const int py, const int dir) 
       if (grid[cx][cy] == ']') cy--;
 
       int nextX = cx + DX[dir];
-
       Q.emplace(nextX, cy);
       Q.emplace(nextX, cy + 1);
    }
 
-   for (int i = int(movedTo.size()) - 1; i >= 0; i--) {
+   for (int i = (int)movedTo.size() - 1; i >= 0; i--) {
       auto [bx, by] = movedTo[i];
       grid[bx][by] = grid[bx - DX[dir]][by];
       grid[bx - DX[dir]][by] = '.';
@@ -73,7 +72,7 @@ pair<int, int> processMultiWidthMove(const int px, const int py, const int dir) 
    return {px + DX[dir], py};
 }
 
-pair<int, int> move(const int px, const int py, const int dir, const bool isPart1) {
+inline pair<int, int> movePlayer(const int px, const int py, const int dir, const bool isPart1) {
    int nx = px + DX[dir];
    int ny = py + DY[dir];
    if (grid[nx][ny] == '#') return {px, py};
@@ -91,73 +90,89 @@ int main() {
 
    auto start = chrono::high_resolution_clock::now();
 
-   freopen("aoc-2024-day-15-challenge-2.txt", "r", stdin);
+   directionMap['^'] = 0;
+   directionMap['>'] = 1;
+   directionMap['v'] = 2;
+   directionMap['<'] = 3;
 
-   string line;
-   while (getline(cin, line) && line != "") {
-      vector<char> row;
-      for (auto c : line) {
-         row.push_back(c);
+   freopen("aoc-2024-day-15-challenge-4.txt", "r", stdin);
+
+   // Read grid
+   {
+      string line;
+      vector<vector<char>> tempGrid;
+      while (true) {
+         if (!std::getline(cin, line) || line.empty()) break;
+         tempGrid.emplace_back(line.begin(), line.end());
       }
-      grid.push_back(row);
+      grid = move(tempGrid);
    }
 
    auto gridCopy = grid;
 
    string moves;
-   while (getline(cin, line)) {
+   string line;
+   while (std::getline(cin, line)) {
       moves += line;
    }
 
    for (int part = 1; part <= 2; part++) {
       if (part == 2) {
-         for (int l = 0; l < int(gridCopy.size()); l++) {
-            string transformedLine = "";
+         for (int l = 0; l < (int)gridCopy.size(); l++) {
+            string transformedLine;
+            transformedLine.reserve(gridCopy[l].size() * 2);
             for (auto c : gridCopy[l]) {
                if (c == '#') transformedLine += "##";
                else if (c == '.') transformedLine += "..";
                else if (c == 'O') transformedLine += "[]";
                else transformedLine += "@.";
             }
-            grid[l].clear();
-            for (auto c : transformedLine)
-               grid[l].push_back(c);
+            vector<char> newRow(transformedLine.begin(), transformedLine.end());
+            grid[l] = move(newRow);
          }
       }
 
-      N = grid.size();
-      M = grid[0].size();
+      N = (int)grid.size();
+      M = (int)grid[0].size();
 
       seen.assign(N, vector<int>(M, 0));
 
       pair<int, int> pos;
-      for (int i = 0; i < N; i++) {
-         for (int j = 0; j < M; j++) {
-            if (grid[i][j] == '@') {
-               pos.first = i;
-               pos.second = j;
-               break;
+      {
+         bool found = false;
+         for (int i = 0; i < N && !found; i++) {
+            for (int j = 0; j < M && !found; j++) {
+               if (grid[i][j] == '@') {
+                  pos = {i, j};
+                  found = true;
+               }
             }
          }
       }
 
       for (auto m : moves) {
-         pos = move(pos.first, pos.second, directionMap[m], part == 1);
+         pos = movePlayer(pos.first, pos.second, directionMap[m], part == 1);
       }
 
       long long ans = 0;
-
       for (int i = 0; i < N; i++) {
          for (int j = 0; j < M; j++) {
-            if (grid[i][j] == '[' || grid[i][j] == 'O') ans += 100 * i + j;
+            char c = grid[i][j];
+            if (c == '[' || c == 'O') ans += 100LL * i + j;
          }
       }
 
-      cout << ans << endl;
+      cout << ans << "\n";
+
+      if (part == 1) {
+         grid = gridCopy;
+      }
    }
 
-   auto stop = chrono::high_resolution_clock::now();
-   cout << "Time: " << chrono::duration_cast<chrono::milliseconds>(stop - start).count() << "ms" << endl;
+   auto stop = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(stop - start);
+   cout << "Time taken: "
+      << duration.count() << " milliseconds" << endl;
 
    return 0;
 }
