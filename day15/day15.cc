@@ -100,7 +100,7 @@ int main() {
    string line;
    vector<vector<char>> tempGrid;
    while (true) {
-      if (!std::getline(cin, line) || line.empty()) break;
+      if (!getline(cin, line) || line.empty()) break;
       tempGrid.emplace_back(line.begin(), line.end());
    }
    grid = move(tempGrid);
@@ -109,7 +109,7 @@ int main() {
    auto gridCopy = grid;
 
    string moves;
-   while (std::getline(cin, line)) {
+   while (getline(cin, line)) {
       moves += line;
    }
 
