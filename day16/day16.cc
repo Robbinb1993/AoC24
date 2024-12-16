@@ -9,12 +9,11 @@ const int DY[4] = {0, 1, 0, -1};
 
 int N, M;
 vector<string> grid;
+vector<int> bestDist;
 
 int getId(const int x, const int y, const int d) {
    return (x * M + y) * 4 + d;
 }
-
-vector<int> bestDist;
 
 int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int dir) {
    bestDist.assign(N * M * 4, INF);
@@ -22,7 +21,6 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
 
    int startId = getId(sx, sy, dir);
    bestDist[startId] = 0;
-
 
    auto cmp = [&](int a, int b) {
       return bestDist[a] > bestDist[b];
