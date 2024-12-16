@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
 const int INF = 1e9;
 const int DX[4] = {-1, 0, 1, 0};
@@ -8,102 +10,105 @@ const int DY[4] = {0, 1, 0, -1};
 int N, M;
 vector<string> grid;
 
-struct State {
-   int dist;
-   int x, y, dir;
+int getId(const int x, const int y, const int d) {
+   return (x * M + y) * 4 + d;
+}
 
-   bool operator<(const State& other) const {
-      return dist > other.dist;
-   }
-
-   State(int dist, int x, int y, int dir)
-      : dist(dist), x(x), y(y), dir(dir) {
-   }
-};
-
-vector<vector<vector<vector<State>>>> parentStates;
-vector<vector<vector<int>>> toDist;
+vector<int> bestDist;
 
 int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int dir) {
-   State start(0, sx, sy, dir);
-   toDist.assign(N, vector<vector<int>>(M, vector<int>(4, INF)));
+   bestDist.assign(N * M * 4, INF);
+   vector<bool> visited(N * M * 4, false);
 
-   toDist[sx][sy][dir] = 0;
-   int bestDist = INF;
+   int startId = getId(sx, sy, dir);
+   bestDist[startId] = 0;
 
-   priority_queue<State> pq;
-   pq.push(start);
+
+   auto cmp = [&](int a, int b) {
+      return bestDist[a] > bestDist[b];
+      };
+   priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
+
+   int bestDistToEnd = INF;
+   pq.push(startId);
 
    while (!pq.empty()) {
-      auto curr = pq.top();
+      int currId = pq.top();
       pq.pop();
 
-      int x = curr.x;
-      int y = curr.y;
-      int d = curr.dir;
+      if (visited[currId]) continue;
+      visited[currId] = true;
+
+      int currDist = bestDist[currId];
+      int x = currId / (M * 4);
+      int y = (currId / 4) % M;
+      int d = currId % 4;
 
       if (x == ex && y == ey) {
-         if (curr.dist > bestDist)
-            return bestDist;
-         bestDist = curr.dist;
-         continue;
+         return currDist;
       }
-      if (toDist[x][y][d] < curr.dist) continue;
 
       int nx = x + DX[d];
       int ny = y + DY[d];
 
-      if (nx >= 0 && nx < N && ny >= 0 && ny < M && grid[nx][ny] != '#') {
-         if (toDist[nx][ny][d] >= toDist[x][y][d] + 1) {
-            parentStates[nx][ny][d].push_back(State(toDist[x][y][d], x, y, d));
-         }
-         if (toDist[nx][ny][d] > toDist[x][y][d] + 1) {
-            toDist[nx][ny][d] = toDist[x][y][d] + 1;
-            pq.push(State(toDist[nx][ny][d], nx, ny, d));
+      if (grid[nx][ny] != '#') {
+         int nextId = getId(nx, ny, d);
+         if (bestDist[nextId] > bestDist[currId] + 1) {
+            bestDist[nextId] = bestDist[currId] + 1;
+            pq.emplace(nextId);
          }
       }
 
-      for (int i = -1; i <= 1; i++) {
-         if (i == 0) continue;
+      for (int i = -1; i <= 1; i += 2) {
          int nextDir = (d + i + 4) % 4;
-         if (toDist[x][y][nextDir] >= toDist[x][y][d] + 1000) {
-            parentStates[x][y][nextDir].push_back(State(toDist[x][y][d], x, y, d));
-         }
-         if (toDist[x][y][nextDir] > toDist[x][y][d] + 1000) {
-            toDist[x][y][nextDir] = toDist[x][y][d] + 1000;
-            pq.push(State(toDist[x][y][nextDir], x, y, nextDir));
+         int nextId = getId(x, y, nextDir);
+         int newDist = bestDist[currId] + 1000;
+         if (bestDist[nextId] > newDist) {
+            bestDist[nextId] = newDist;
+            pq.emplace(nextId);
          }
       }
    }
 
-   return bestDist;
+   return bestDistToEnd;
 }
 
 vector<vector<bool>> seen;
-vector<vector<vector<bool>>> seenState;
+vector<int> seenState;
 
-void DFS(const int x, const int y, const int dir) {
-   vector<tuple<int, int, int>> stack;
-
-   stack.emplace_back(x, y, dir);
-
-   seen[x][y] = true;
-   seenState[dir][x][y] = true;
+void DFS(const int endId) {
+   vector<int> stack;
+   stack.push_back(endId);
 
    while (!stack.empty()) {
-      auto [cx, cy, cdir] = stack.back();
+      int currId = stack.back();
       stack.pop_back();
 
-      seen[cx][cy] = true;
+      int x = currId / (M * 4);
+      int y = (currId / 4) % M;
+      int dir = currId % 4;
 
-      for (auto& p : parentStates[cx][cy][cdir]) {
-         int nx = p.x;
-         int ny = p.y;
-         int nd = p.dir;
+      seen[x][y] = true;
 
-         if (!seenState[nd][nx][ny]) {
-            seenState[nd][nx][ny] = true;
-            stack.emplace_back(nx, ny, nd);
+      for (int i = 0; i < 4; i++) {
+         int nx = x + DX[i];
+         int ny = y + DY[i];
+         int nxtId = getId(nx, ny, dir);
+         if (grid[nx][ny] != '#' && !seenState[nxtId]) {
+            seenState[nxtId] = true;
+            if (bestDist[nxtId] == bestDist[currId] - 1) {
+               stack.push_back(nxtId);
+            }
+         }
+      }
+      for (int i = -1; i <= 1; i += 2) {
+         int nextDir = (dir + i + 4) % 4;
+         int nxtId = getId(x, y, nextDir);
+         if (!seenState[nxtId]) {
+            seenState[nxtId] = true;
+            if (bestDist[nxtId] == bestDist[currId] - 1000) {
+               stack.push_back(nxtId);
+            }
          }
       }
    }
@@ -113,7 +118,9 @@ int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
-   freopen("turnalot.txt", "r", stdin);
+   auto start = high_resolution_clock::now();
+
+   freopen("maze-large.txt", "r", stdin);
 
    string line;
    while (getline(cin, line)) {
@@ -122,8 +129,6 @@ int main() {
 
    N = grid.size();
    M = grid[0].size();
-
-   parentStates.assign(N, vector<vector<vector<State>>>(M, vector<vector<State>>(4)));
 
    int sx, sy, ex, ey;
    for (int i = 0; i < int(grid.size()); i++) {
@@ -142,11 +147,12 @@ int main() {
    int minDist = Dijkstra(sx, sy, ex, ey, 1);
 
    seen.assign(N, vector<bool>(M, false));
-   seenState.assign(4, vector<vector<bool>>(N, vector<bool>(M, false)));
+   seenState.assign(4 * N * M, 0);
 
    for (int i = 0; i < 4; i++) {
-      if (toDist[ex][ey][i] == minDist)
-         DFS(ex, ey, i);
+      int endId = getId(ex, ey, i);
+      if (bestDist[endId] == minDist)
+         DFS(endId);
    }
 
    int nodesOnBestRoute = 0;
@@ -156,6 +162,10 @@ int main() {
             nodesOnBestRoute++;
 
    cout << minDist << " " << nodesOnBestRoute << endl;
+
+   auto stop = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(stop - start);
+   cout << "Time passed: " << duration.count() << "ms" << endl;
 
    return 0;
 }
