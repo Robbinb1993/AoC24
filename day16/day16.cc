@@ -11,7 +11,7 @@ int N, M;
 vector<string> grid;
 vector<int> bestDist;
 
-int getId(const int x, const int y, const int d) {
+inline int getId(const int x, const int y, const int d) {
    return (x * M + y) * 4 + d;
 }
 
@@ -88,17 +88,16 @@ void DFS(const int endId) {
 
       seen[x][y] = true;
 
-      for (int i = 0; i < 4; i++) {
-         int nx = x + DX[i];
-         int ny = y + DY[i];
-         int nxtId = getId(nx, ny, dir);
-         if (grid[nx][ny] != '#' && !seenState[nxtId]) {
-            seenState[nxtId] = true;
-            if (bestDist[nxtId] == bestDist[currId] - 1) {
-               stack.push_back(nxtId);
-            }
+      int nx = x + DX[dir];
+      int ny = y + DY[dir];
+      int nxtId = getId(nx, ny, dir);
+      if (grid[nx][ny] != '#' && !seenState[nxtId]) {
+         seenState[nxtId] = true;
+         if (bestDist[nxtId] == bestDist[currId] - 1) {
+            stack.push_back(nxtId);
          }
       }
+
       for (int i = -1; i <= 1; i += 2) {
          int nextDir = (dir + i + 4) % 4;
          int nxtId = getId(x, y, nextDir);
