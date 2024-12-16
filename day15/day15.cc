@@ -41,7 +41,7 @@ inline pair<int, int> processSingleWidthMove(const int px, const int py, const i
 inline pair<int, int> processMultiWidthMove(const int px, const int py, const int dir) {
    runItr++;
    vector<pair<int, int>> movedTo;
-   movedTo.reserve(2000);
+   movedTo.reserve(N);
    queue<pair<int, int>> Q;
    Q.emplace(px + DX[dir], py);
 
