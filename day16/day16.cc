@@ -48,7 +48,6 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
 
       int nx = x + DX[d];
       int ny = y + DY[d];
-
       if (grid[nx][ny] != '#') {
          int nextId = getId(nx, ny, d);
          if (bestDist[nextId] > bestDist[currId] + 1) {
@@ -88,8 +87,8 @@ void DFS(const int endId) {
 
       seen[x][y] = true;
 
-      int nx = x + DX[dir];
-      int ny = y + DY[dir];
+      int nx = x - DX[dir];
+      int ny = y - DY[dir];
       int nxtId = getId(nx, ny, dir);
       if (grid[nx][ny] != '#' && !seenState[nxtId]) {
          seenState[nxtId] = true;
