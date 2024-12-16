@@ -6,7 +6,7 @@ const int DY[4] = {0, 1, 0, -1};
 unordered_map<char, int> directionMap = {{'^', 0}, {'>', 1}, {'v', 2}, {'<', 3}};
 
 int N, M;
-vector<string> grid;
+vector<vector<char>> grid;
 vector<vector<int>> seen;
 int runItr = 0;
 
@@ -38,27 +38,39 @@ pair<int, int> processSingleWidthMove(const int px, const int py, const int nx, 
 }
 
 //Used to move the 1x2 blocks vertically.
-bool processMultiWidthMove(const int px, int py, const int dir, vector<pair<int, int>>& boxes) {
-   if (grid[px][py] == '#') return false;
-   if (grid[px][py] == '.') return true;
-   if (grid[px][py] == ']')
-      py--;
+pair<int, int> processMultiWidthMove(const int px, const int py, const int dir) {
+   runItr++;
 
-   if (seen[px][py] == runItr) return true;
-   seen[px][py] = runItr;
+   vector<pair<int, int>> movedTo;
+   queue<pair<int, int>> Q;
+   Q.emplace(px + DX[dir], py);
 
-   int nx = px + DX[dir];
+   while (!Q.empty()) {
+      auto [cx, cy] = Q.front();
+      Q.pop();
 
-   // Check feasibility for both parts (left and right) of current [] block to be moved.
-   bool canMoveLeftHalf = processMultiWidthMove(nx, py, dir, boxes);
-   bool canMoveRightHalf = processMultiWidthMove(nx, py + 1, dir, boxes);
+      if (seen[cx][cy] == runItr) continue;
+      seen[cx][cy] = runItr;
 
-   if (!canMoveLeftHalf || !canMoveRightHalf) return false;
+      movedTo.emplace_back(cx, cy);
 
-   boxes.emplace_back(nx, py);
-   boxes.emplace_back(nx, py + 1);
+      if (grid[cx][cy] == '#') return {px, py};
+      if (grid[cx][cy] == '.') continue;
+      if (grid[cx][cy] == ']') cy--;
 
-   return true;
+      int nextX = cx + DX[dir];
+
+      Q.emplace(nextX, cy);
+      Q.emplace(nextX, cy + 1);
+   }
+
+   for (int i = int(movedTo.size()) - 1; i >= 0; i--) {
+      auto [bx, by] = movedTo[i];
+      grid[bx][by] = grid[bx - DX[dir]][by];
+      grid[bx - DX[dir]][by] = '.';
+   }
+
+   return {px + DX[dir], py};
 }
 
 pair<int, int> move(const int px, const int py, const int dir, const bool isPart1) {
@@ -69,20 +81,8 @@ pair<int, int> move(const int px, const int py, const int dir, const bool isPart
       return processSingleWidthMove(px, py, nx, ny, dir);
    }
    else {
-      runItr++;
-      vector<pair<int, int>> boxes;
-      if (processMultiWidthMove(nx, ny, dir, boxes)) {
-         for (auto [bx, by] : boxes) {
-            grid[bx][by] = grid[bx - DX[dir]][by];
-            grid[bx - DX[dir]][by] = '.';
-         }
-
-         grid[nx][ny] = '@';
-         grid[px][py] = '.';
-         return {nx, ny};
-      }
+      return processMultiWidthMove(px, py, dir);
    }
-   return {px, py};
 }
 
 int main() {
@@ -91,12 +91,17 @@ int main() {
 
    auto start = chrono::high_resolution_clock::now();
 
-   freopen("aoc-2024-day-15-challenge-4.txt", "r", stdin);
+   freopen("aoc-2024-day-15-challenge-2.txt", "r", stdin);
 
    string line;
    while (getline(cin, line) && line != "") {
-      grid.push_back(line);
+      vector<char> row;
+      for (auto c : line) {
+         row.push_back(c);
+      }
+      grid.push_back(row);
    }
+
    auto gridCopy = grid;
 
    string moves;
@@ -114,12 +119,15 @@ int main() {
                else if (c == 'O') transformedLine += "[]";
                else transformedLine += "@.";
             }
-            grid[l] = transformedLine;
+            grid[l].clear();
+            for (auto c : transformedLine)
+               grid[l].push_back(c);
          }
       }
 
       N = grid.size();
       M = grid[0].size();
+
       seen.assign(N, vector<int>(M, 0));
 
       pair<int, int> pos;
