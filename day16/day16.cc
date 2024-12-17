@@ -10,6 +10,7 @@ const int DY[4] = {0, 1, 0, -1};
 int N, M;
 vector<string> grid;
 vector<int> bestDist;
+vector<vector<int>> bucketQueue;
 
 inline int getId(const int x, const int y, const int d) {
    return (x * M + y) * 4 + d;
@@ -22,48 +23,46 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
    int startId = getId(sx, sy, dir);
    bestDist[startId] = 0;
 
-   auto cmp = [&](int a, int b) {
-      return bestDist[a] > bestDist[b];
-      };
-   priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
+   bucketQueue.assign(25000000, vector<int>());
+   int idx = 0;
 
-   pq.push(startId);
+   bucketQueue[0].push_back(startId);
 
-   while (!pq.empty()) {
-      int currId = pq.top();
-      pq.pop();
+   while (idx < int(bucketQueue.size())) {
+      for (auto currId : bucketQueue[idx]) {
+         if (visited[currId]) continue;
+         visited[currId] = true;
 
-      if (visited[currId]) continue;
-      visited[currId] = true;
+         int currDist = bestDist[currId];
+         int x = currId / (M * 4);
+         int y = (currId / 4) % M;
+         int d = currId % 4;
 
-      int currDist = bestDist[currId];
-      int x = currId / (M * 4);
-      int y = (currId / 4) % M;
-      int d = currId % 4;
+         if (x == ex && y == ey) {
+            return currDist;
+         }
 
-      if (x == ex && y == ey) {
-         return currDist;
-      }
+         int nx = x + DX[d];
+         int ny = y + DY[d];
+         if (grid[nx][ny] != '#') {
+            int nextId = getId(nx, ny, d);
+            if (bestDist[nextId] > bestDist[currId] + 1) {
+               bestDist[nextId] = bestDist[currId] + 1;
+               bucketQueue[bestDist[nextId]].push_back(nextId);
+            }
+         }
 
-      int nx = x + DX[d];
-      int ny = y + DY[d];
-      if (grid[nx][ny] != '#') {
-         int nextId = getId(nx, ny, d);
-         if (bestDist[nextId] > bestDist[currId] + 1) {
-            bestDist[nextId] = bestDist[currId] + 1;
-            pq.emplace(nextId);
+         for (int i = -1; i <= 1; i += 2) {
+            int nextDir = (d + i + 4) % 4;
+            int nextId = getId(x, y, nextDir);
+            int newDist = bestDist[currId] + 1000;
+            if (bestDist[nextId] > newDist) {
+               bestDist[nextId] = newDist;
+               bucketQueue[newDist].push_back(nextId);
+            }
          }
       }
-
-      for (int i = -1; i <= 1; i += 2) {
-         int nextDir = (d + i + 4) % 4;
-         int nextId = getId(x, y, nextDir);
-         int newDist = bestDist[currId] + 1000;
-         if (bestDist[nextId] > newDist) {
-            bestDist[nextId] = newDist;
-            pq.emplace(nextId);
-         }
-      }
+      idx++;
    }
 
    return INF;
@@ -115,7 +114,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("maze-large.txt", "r", stdin);
+   freopen("maze-medium.txt", "r", stdin);
 
    string line;
    while (getline(cin, line)) {
