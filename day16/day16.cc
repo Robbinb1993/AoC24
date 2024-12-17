@@ -123,7 +123,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("maze-medium.txt", "r", stdin);
+   freopen("maze-large.txt", "r", stdin);
 
    string line;
    while (getline(cin, line)) {
