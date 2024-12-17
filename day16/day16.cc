@@ -23,7 +23,7 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
    int startId = getId(sx, sy, dir);
    bestDist[startId] = 0;
 
-   bucketQueue.reserve(M * N * 20);
+   bucketQueue.reserve(M * N * 10);
    bucketQueue.push_back(vector<int>());
    bucketQueue[0].push_back(startId);
 
