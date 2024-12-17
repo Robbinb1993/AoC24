@@ -27,7 +27,6 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
       };
    priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
 
-   int bestDistToEnd = INF;
    pq.push(startId);
 
    while (!pq.empty()) {
@@ -67,7 +66,7 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
       }
    }
 
-   return bestDistToEnd;
+   return INF;
 }
 
 vector<vector<bool>> seen;
