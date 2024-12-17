@@ -23,11 +23,11 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
    int startId = getId(sx, sy, dir);
    bestDist[startId] = 0;
 
-   bucketQueue.assign(25000000, vector<int>());
-   int idx = 0;
-
+   bucketQueue.reserve(M * N * 20);
+   bucketQueue.push_back(vector<int>());
    bucketQueue[0].push_back(startId);
 
+   int idx = 0;
    while (idx < int(bucketQueue.size())) {
       for (auto currId : bucketQueue[idx]) {
          if (visited[currId]) continue;
@@ -48,6 +48,8 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
             int nextId = getId(nx, ny, d);
             if (bestDist[nextId] > bestDist[currId] + 1) {
                bestDist[nextId] = bestDist[currId] + 1;
+               while (int(bucketQueue.size()) <= bestDist[nextId])
+                  bucketQueue.push_back(vector<int>());
                bucketQueue[bestDist[nextId]].push_back(nextId);
             }
          }
@@ -58,6 +60,8 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
             int newDist = bestDist[currId] + 1000;
             if (bestDist[nextId] > newDist) {
                bestDist[nextId] = newDist;
+               while (int(bucketQueue.size()) <= newDist)
+                  bucketQueue.push_back(vector<int>());
                bucketQueue[newDist].push_back(nextId);
             }
          }
@@ -114,7 +118,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("maze-medium.txt", "r", stdin);
+   freopen("maze-large.txt", "r", stdin);
 
    string line;
    while (getline(cin, line)) {
