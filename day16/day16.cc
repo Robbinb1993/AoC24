@@ -129,8 +129,8 @@ int main() {
    M = grid[0].size();
 
    int sx, sy, ex, ey;
-   for (int i = 0; i < int(grid.size()); i++) {
-      for (int j = 0; j < int(grid[i].size()); j++) {
+   for (int i = 0; i < N; i++) {
+      for (int j = 0; j < M; j++) {
          if (grid[i][j] == 'S') {
             sx = i;
             sy = j;
