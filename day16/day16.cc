@@ -6,6 +6,8 @@ using namespace chrono;
 const int INF = 1e9;
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
+const int MAX_EDGE_WEIGHT = 1000;
+const int TOT_BUCKETS = MAX_EDGE_WEIGHT + 1;
 
 int N, M;
 vector<string> grid;
@@ -23,13 +25,18 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
    int startId = getId(sx, sy, dir);
    bestDist[startId] = 0;
 
-   bucketQueue.reserve(M * N * 10);
-   bucketQueue.push_back(vector<int>());
+   bucketQueue.assign(TOT_BUCKETS, vector<int>());
    bucketQueue[0].push_back(startId);
 
    int idx = 0;
-   while (idx < int(bucketQueue.size())) {
-      for (auto currId : bucketQueue[idx]) {
+   int lastAdded = 0;
+
+   while (idx - lastAdded <= MAX_EDGE_WEIGHT) {
+      auto& bucket = bucketQueue[idx % TOT_BUCKETS];
+      while (!bucket.empty()) {
+         int currId = bucket.back();
+         bucket.pop_back();
+
          if (visited[currId]) continue;
          visited[currId] = true;
 
@@ -48,9 +55,8 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
             int nextId = getId(nx, ny, d);
             if (bestDist[nextId] > bestDist[currId] + 1) {
                bestDist[nextId] = bestDist[currId] + 1;
-               while (int(bucketQueue.size()) <= bestDist[nextId])
-                  bucketQueue.push_back(vector<int>());
-               bucketQueue[bestDist[nextId]].push_back(nextId);
+               lastAdded = idx;
+               bucketQueue[bestDist[nextId] % TOT_BUCKETS].push_back(nextId);
             }
          }
 
@@ -60,9 +66,8 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
             int newDist = bestDist[currId] + 1000;
             if (bestDist[nextId] > newDist) {
                bestDist[nextId] = newDist;
-               while (int(bucketQueue.size()) <= newDist)
-                  bucketQueue.push_back(vector<int>());
-               bucketQueue[newDist].push_back(nextId);
+               lastAdded = idx;
+               bucketQueue[newDist % TOT_BUCKETS].push_back(nextId);
             }
          }
       }
@@ -118,7 +123,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("maze-large.txt", "r", stdin);
+   freopen("maze-medium.txt", "r", stdin);
 
    string line;
    while (getline(cin, line)) {
