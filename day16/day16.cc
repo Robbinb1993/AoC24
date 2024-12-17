@@ -152,17 +152,18 @@ int main() {
    seen.assign(N, vector<bool>(M, false));
    seenState.assign(4 * N * M, 0);
 
-   for (int i = 0; i < 4; i++) {
-      int endId = getId(ex, ey, i);
-      if (bestDist[endId] == minDist)
-         DFS(endId);
-   }
-
    int nodesOnBestRoute = 0;
-   for (int i = 0; i < N; i++)
-      for (int j = 0; j < M; j++)
-         if (seen[i][j])
-            nodesOnBestRoute++;
+   if (minDist != INF) {
+      for (int i = 0; i < 4; i++) {
+         int endId = getId(ex, ey, i);
+         if (bestDist[endId] == minDist)
+            DFS(endId);
+      }
+      for (int i = 0; i < N; i++)
+         for (int j = 0; j < M; j++)
+            if (seen[i][j])
+               nodesOnBestRoute++;
+   }
 
    cout << minDist << " " << nodesOnBestRoute << endl;
 
