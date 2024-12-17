@@ -29,9 +29,9 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
    bucketQueue[0].push_back(startId);
 
    int idx = 0;
-   int lastAdded = 0;
+   int lastAddedIdx = 0;
 
-   while (idx - lastAdded <= MAX_EDGE_WEIGHT) {
+   while (idx - lastAddedIdx <= MAX_EDGE_WEIGHT) {
       auto& bucket = bucketQueue[idx % TOT_BUCKETS];
       while (!bucket.empty()) {
          int currId = bucket.back();
@@ -55,7 +55,7 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
             int nextId = getId(nx, ny, d);
             if (bestDist[nextId] > bestDist[currId] + 1) {
                bestDist[nextId] = bestDist[currId] + 1;
-               lastAdded = idx;
+               lastAddedIdx = idx;
                bucketQueue[bestDist[nextId] % TOT_BUCKETS].push_back(nextId);
             }
          }
@@ -66,7 +66,7 @@ int Dijkstra(const int sx, const int sy, const int ex, const int ey, const int d
             int newDist = bestDist[currId] + 1000;
             if (bestDist[nextId] > newDist) {
                bestDist[nextId] = newDist;
-               lastAdded = idx;
+               lastAddedIdx = idx;
                bucketQueue[newDist % TOT_BUCKETS].push_back(nextId);
             }
          }
