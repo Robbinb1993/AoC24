@@ -118,7 +118,7 @@ int main() {
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
 
-   cout << bytes[ans].first << " " << bytes[ans].second << " " << ((long long)bytes[ans].first * bytes[ans].second) << endl;
+   cout << bytes[ans].first << " " << bytes[ans].second << " " << bytes[ans].first * bytes[ans].second << endl;
    cout << "Time: " << duration.count() << " milliseconds" << endl;
 
    return 0;
