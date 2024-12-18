@@ -7,7 +7,7 @@ const int INF = 1e9;
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
 
-vector<vector<char>> grid;
+vector<vector<char>> grid(N, vector<char>(M, '.'));
 vector<pair<int, int>> bytes;
 
 int BFS() {
@@ -42,11 +42,14 @@ int BFS() {
    return -1;
 }
 
-int BFS(const int totBytes) {
-   grid.assign(N, vector<char>(totBytes, '.'));
-   for (int i = 0; i <= totBytes; i++) {
+int BFS(const int prevBytes, const int totBytes) {
+   for (int i = prevBytes + 1; i <= totBytes; i++) {
       auto [x, y] = bytes[i];
       grid[x][y] = '#';
+   }
+   for (int i = totBytes + 1; i <= prevBytes; i++) {
+      auto [x, y] = bytes[i];
+      grid[x][y] = '.';
    }
 
    return BFS();
@@ -69,22 +72,24 @@ int main() {
       }
    }
 
+   int prv = -1;
    int L = 0;
    int R = int(bytes.size()) - 1;
    int ans;
 
    while (L <= R) {
       int mid = (L + R) / 2;
-      if (BFS(mid) != -1) {
+      if (BFS(prv, mid) != -1) {
          L = mid + 1;
          ans = mid;
       }
       else {
          R = mid - 1;
       }
+      prv = mid;
    }
 
-   cout << BFS(1024) << " " << bytes[ans + 1].first << " " << bytes[ans + 1].second << endl;
+   cout << BFS(prv, 1024) << " " << bytes[ans + 1].first << " " << bytes[ans + 1].second << endl;
 
    return 0;
 }
