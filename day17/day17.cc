@@ -4,7 +4,7 @@ using namespace std;
 long long startA, startB, startC;
 vector<int> program;
 
-long long getComboVal(const int idx, const int long long A, const int long long B, const int long long C) {
+long long getComboVal(const int idx, const long long A, const long long B, const long long C) {
    if (idx <= 3)
       return idx;
    else if (idx == 4)
