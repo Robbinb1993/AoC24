@@ -3,42 +3,48 @@
 using namespace std;
 using namespace chrono;
 
-class Trie {
-public:
-   unique_ptr<Trie> children[26];
-   bool isEndOfWord;
+struct TrieNode {
+   int children[26]; // Indices of child nodes ('a' to 'z')
+   bool isEndOfWord = false;
 
-   Trie() : isEndOfWord(false) {}
-
-   void insert(const string& word) {
-      Trie* node = this;
-      for (char c : word) {
-         if (!node->children[c - 'a'])
-            node->children[c - 'a'] = make_unique<Trie>();
-         node = node->children[c - 'a'].get();
-      }
-      node->isEndOfWord = true;
+   TrieNode() {
+      fill(begin(children), end(children), -1);
    }
 };
 
-unique_ptr<Trie> dictionary = make_unique<Trie>();
+const int MAXN = 500000;
+vector<TrieNode> trie(MAXN);
+int trieNodeCount = 1;
+
+void insert(const string& word) {
+   int node = 0; // Start at the root
+   for (char c : word) {
+      int& child = trie[node].children[c - 'a'];
+      if (child == -1) {
+         child = trieNodeCount++;
+      }
+      node = child;
+   }
+   trie[node].isEndOfWord = true;
+}
 
 vector<long long> DP;
+
 long long solve(const int idx, const string& word) {
    if (idx == word.size()) return 1;
 
    if (DP[idx] != -1) return DP[idx];
    long long tot = 0;
 
-   Trie* node = dictionary.get();
+   int node = 0;
    for (int i = idx; i < word.size(); i++) {
       char c = word[i];
 
-      if (!node->children[c - 'a']) break;
+      if (trie[node].children[c - 'a'] == -1) break;
 
-      node = node->children[c - 'a'].get();
+      node = trie[node].children[c - 'a'];
 
-      if (node->isEndOfWord) {
+      if (trie[node].isEndOfWord) {
          tot += solve(i + 1, word);
       }
    }
@@ -52,7 +58,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("in.txt", "r", stdin);
+   freopen("aoc-2024-day-19-challenge-2.txt", "r", stdin);
 
    string line;
    getline(cin, line);
@@ -66,14 +72,16 @@ int main() {
 
       if (start != string::npos) {
          word = word.substr(start, end - start + 1);
-         dictionary->insert(word);
+         insert(word);
       }
    }
 
    long long ans = 0;
+
    while (cin >> word) {
       DP.assign(word.size(), -1);
       ans += solve(0, word);
+      cout << ans << endl;
    }
 
    auto stop = high_resolution_clock::now();
