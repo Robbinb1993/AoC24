@@ -100,7 +100,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-18-challenge-5-2500x2500.txt", "r", stdin);
+   freopen("aoc-2024-day-18-challenge-3-2500x2500.txt", "r", stdin);
 
    string input_line;
 
