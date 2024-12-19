@@ -1,65 +1,106 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
-const int N = 71;
-const int M = 71;
+const int N = 2501;
+const int M = 2501;
 const int INF = 1e9;
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
 
+class DSU {
+private:
+   vector<int> parent, size;
+
+public:
+   DSU(const int sz) {
+      parent.assign(sz, 0);
+      size.assign(sz, 1);
+      iota(parent.begin(), parent.end(), 0);
+   }
+   int getSetSize(int v);
+   int findSetParent(int v);
+   void uniteSets(int a, int b);
+};
+
+int DSU::getSetSize(int v) {
+   int p = findSetParent(v);
+   return size[p];
+}
+
+int DSU::findSetParent(int v) {
+   if (v == parent[v])
+      return v;
+   return parent[v] = findSetParent(parent[v]);
+}
+
+void DSU::uniteSets(int a, int b) {
+   a = findSetParent(a);
+   b = findSetParent(b);
+   if (a != b) {
+      if (size[a] < size[b])
+         swap(a, b);
+      parent[b] = a;
+      size[a] += size[b];
+   }
+}
+
 vector<vector<char>> grid(N, vector<char>(M, '.'));
 vector<pair<int, int>> bytes;
+DSU dsu(N* M);
 
-int BFS() {
-   queue<pair<int, int>> Q;
-   vector<vector<int>> dist(N, vector<int>(M, INF));
-   dist[0][0] = 0;
-   Q.emplace(0, 0);
+int solve() {
+   for (auto [x, y] : bytes) {
+      grid[x][y] = '#';
+   }
 
-   while (!Q.empty()) {
-      auto [x, y] = Q.front();
-
-      if (x == N - 1 && y == M - 1) {
-         return dist[x][y];
-      }
-
-      Q.pop();
-
-      for (int i = 0; i < 4; i++) {
-         int nx = x + DX[i];
-         int ny = y + DY[i];
-
-         if (nx < 0 || nx >= N || ny < 0 || ny >= M) continue;
-         if (grid[nx][ny] == '#') continue;
-
-         if (dist[nx][ny] > dist[x][y] + 1) {
-            dist[nx][ny] = dist[x][y] + 1;
-            Q.emplace(nx, ny);
+   for (int x = 0; x < N; x++) {
+      for (int y = 0; y < M; y++) {
+         if (grid[x][y] == '#')
+            continue;
+         for (int k = 0; k < 4; k++) {
+            int nx = x + DX[k];
+            int ny = y + DY[k];
+            if (nx >= 0 && nx < N && ny >= 0 && ny < M && grid[nx][ny] == '.') {
+               int fromId = x * M + y;
+               int toId = nx * M + ny;
+               dsu.uniteSets(fromId, toId);
+            }
          }
       }
    }
 
-   return -1;
-}
+   if (dsu.findSetParent(0) == dsu.findSetParent(N * M - 1))
+      return int(bytes.size());
 
-int BFS(const int prevBytes, const int totBytes) {
-   for (int i = prevBytes + 1; i <= totBytes; i++) {
-      auto [x, y] = bytes[i];
-      grid[x][y] = '#';
-   }
-   for (int i = totBytes + 1; i <= prevBytes; i++) {
+   for (int i = int(bytes.size()) - 1; i >= 0; i--) {
       auto [x, y] = bytes[i];
       grid[x][y] = '.';
+      for (int k = 0; k < 4; k++) {
+         int nx = x + DX[k];
+         int ny = y + DY[k];
+
+         if (nx >= 0 && nx < N && ny >= 0 && ny < M && grid[nx][ny] == '.') {
+            int fromId = x * M + y;
+            int toId = nx * M + ny;
+            dsu.uniteSets(fromId, toId);
+         }
+      }
+      if (dsu.findSetParent(0) == dsu.findSetParent(N * M - 1))
+         return i;
    }
 
-   return BFS();
+   return -1;
 }
 
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
-   freopen("in.txt", "r", stdin);
+   auto start = high_resolution_clock::now();
+
+   freopen("aoc-2024-day-18-challenge-5-2500x2500.txt", "r", stdin);
 
    string input_line;
 
@@ -72,24 +113,13 @@ int main() {
       }
    }
 
-   int prv = -1;
-   int L = 0;
-   int R = int(bytes.size()) - 1;
-   int ans;
+   int ans = solve();
 
-   while (L <= R) {
-      int mid = (L + R) / 2;
-      if (BFS(prv, mid) != -1) {
-         L = mid + 1;
-         ans = mid;
-      }
-      else {
-         R = mid - 1;
-      }
-      prv = mid;
-   }
+   auto stop = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(stop - start);
 
-   cout << BFS(prv, 1024) << " " << bytes[ans + 1].first << " " << bytes[ans + 1].second << endl;
+   cout << bytes[ans].first << " " << bytes[ans].second << " " << bytes[ans].first * bytes[ans].second << endl;
+   cout << "Time: " << duration.count() << " milliseconds" << endl;
 
    return 0;
 }
