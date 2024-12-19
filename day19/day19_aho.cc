@@ -19,16 +19,16 @@ public:
    AhoCorasick() { automaton.push_back(AhoNode()); }
 
    void insert(const string& word) {
-      int cur = 0;
+      int curr = 0;
       for (char c : word) {
          int idx = c - 'a';
-         if (automaton[cur].next[idx] == -1) {
-            automaton[cur].next[idx] = (int)automaton.size();
+         if (automaton[curr].next[idx] == -1) {
+            automaton[curr].next[idx] = (int)automaton.size();
             automaton.push_back(AhoNode());
          }
-         cur = automaton[cur].next[idx];
+         curr = automaton[curr].next[idx];
       }
-      automaton[cur].out.push_back((int)word.size());
+      automaton[curr].out.push_back((int)word.size());
    }
 
    void build() {
