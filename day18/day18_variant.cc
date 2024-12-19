@@ -73,6 +73,7 @@ void fastInput() {
    bool isX = true;
    pair<int, int> currentPair;
 
+   //Use getchar_unlocked on Linux
    while ((c = _getchar_nolock()) != EOF) {
       if (c >= '0' && c <= '9') {
          num = num * 10 + (c - '0');
