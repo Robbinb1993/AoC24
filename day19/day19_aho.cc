@@ -32,20 +32,20 @@ public:
    }
 
    void build() {
-      queue<int>q;
+      queue<int> Q;
       for (int c = 0; c < 26; c++) {
          int nxt = automaton[0].next[c];
          if (nxt != -1) {
             automaton[nxt].fail = 0;
-            q.push(nxt);
+            Q.push(nxt);
          }
          else {
             automaton[0].next[c] = 0;
          }
       }
 
-      while (!q.empty()) {
-         int u = q.front(); q.pop();
+      while (!Q.empty()) {
+         int u = Q.front(); Q.pop();
          int f = automaton[u].fail;
 
          for (auto& length : automaton[f].out) {
@@ -55,7 +55,7 @@ public:
             int nxt = automaton[u].next[c];
             if (nxt != -1) {
                automaton[nxt].fail = automaton[f].next[c];
-               q.push(nxt);
+               Q.push(nxt);
             }
             else {
                automaton[u].next[c] = automaton[f].next[c];
