@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <cstddef>
 #include <chrono>
 using namespace std;
 using namespace chrono;
@@ -82,7 +83,7 @@ long long solve(const string& pattern) {
    DP[0] = 1; // 1 way to match an empty prefix
    int curr = 0;
 
-   for (int i = 0; i < (int)pattern.size(); i++) {
+   for (size_t i = 0; i < pattern.size(); i++) {
       char c = pattern[i];
       curr = aho.nextState(curr, c); // Transition in the automaton
       for (int length : aho.getOutputs(curr)) {
@@ -105,14 +106,15 @@ int main() {
    string line;
    getline(cin, line);
 
-   istringstream stream(line);
+   istringstream ss(line);
    string word;
 
-   while (getline(stream, word, ',')) {
-      while (!word.empty() && isspace((unsigned char)word.front())) word.erase(word.begin());
-      while (!word.empty() && isspace((unsigned char)word.back())) word.pop_back();
+   while (getline(ss, word, ',')) {
+      size_t start = word.find_first_not_of(" \t");
+      size_t end = word.find_last_not_of(" \t");
 
-      if (!word.empty()) {
+      if (start != string::npos) {
+         word = word.substr(start, end - start + 1);
          aho.insert(word);
       }
    }
