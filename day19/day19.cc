@@ -54,14 +54,18 @@ int main() {
 
    freopen("in.txt", "r", stdin);
 
-   string line, word;
+   string line;
    getline(cin, line);
-   istringstream stream(line);
-   while (getline(stream, word, ',')) {
-      word.erase(0, word.find_first_not_of(' '));
-      word.erase(word.find_last_not_of(' ') + 1);
 
-      if (!word.empty()) {
+   istringstream ss(line);
+   string word;
+
+   while (getline(ss, word, ',')) {
+      size_t start = word.find_first_not_of(" \t");
+      size_t end = word.find_last_not_of(" \t");
+
+      if (start != string::npos) {
+         word = word.substr(start, end - start + 1);
          dictionary->insert(word);
       }
    }
