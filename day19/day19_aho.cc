@@ -3,19 +3,21 @@
 using namespace std;
 using namespace chrono;
 
-struct AhoNode {
-   array<int, 26> next;
-   int fail;
-   vector<int> out;
-   AhoNode() {
-      next.fill(-1);
-      fail = -1;
-   }
-};
-
 class AhoCorasick {
-public:
+private:
+   struct AhoNode {
+      array<int, 26> next;
+      int fail;
+      vector<int> out;
+      AhoNode() {
+         next.fill(-1);
+         fail = -1;
+      }
+   };
+
    vector<AhoNode> automaton;
+
+public:
    AhoCorasick() { automaton.push_back(AhoNode()); }
 
    void insert(const string& word) {
