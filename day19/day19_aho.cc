@@ -66,11 +66,11 @@ public:
       }
    }
 
-   int nextState(int curr, char c) const {
+   int nextState(const int curr, const char c) const {
       return automaton[curr].next[c - 'a'];
    }
 
-   const vector<int>& getOutputs(int state) const {
+   const vector<int>& getOutputs(const int state) const {
       return automaton[state].out;
    }
 };
