@@ -3,6 +3,72 @@
 using namespace std;
 using namespace chrono;
 
+class Trie;
+
+vector<string> patterns;
+vector<Trie*> flatTrie;
+int trieNodeCount = 1;
+
+class Trie {
+public:
+   unique_ptr<Trie> children[26];
+   Trie* parent;                 // Pointer to the parent node
+   vector<Trie*> ancestors;      // Binary lifting table
+   long long DP;                 // DP value for this node
+   int idx;
+
+   Trie() : parent(nullptr), DP(-1), idx(0) {}
+
+   void insert(const string& word) {
+      Trie* node = this;
+      for (char c : word) {
+         if (!node->children[c - 'a']) {
+            node->children[c - 'a'] = make_unique<Trie>();
+            Trie* newNode = node->children[c - 'a'].get();
+            newNode->parent = node;
+            newNode->idx = trieNodeCount++;
+            flatTrie.push_back(newNode);
+         }
+         node = node->children[c - 'a'].get();
+      }
+   }
+};
+
+Trie root;
+vector<vector<int>> par;
+int LOGN;
+
+void computeAncestors() {
+   LOGN = ceil(log2(trieNodeCount)) + 1;
+   par.assign(LOGN, vector<int>(trieNodeCount, -1));
+
+   for (Trie* node : flatTrie) {
+      if (node->parent) {
+         par[0][node->idx] = node->parent->idx; // 2^0 ancestor
+      }
+   }
+
+   // Binary lifting for higher levels
+   for (int k = 1; k < LOGN; k++) {
+      for (int i = 0; i < trieNodeCount; i++) {
+         if (par[k - 1][i] != -1) {
+            par[k][i] = par[k - 1][par[k - 1][i]];
+         }
+      }
+   }
+}
+
+//Get N'th parent in O(log(N)) time using binary lifting
+int getNthParent(int nodeIndex, int N) {
+   for (int k = 0; k < LOGN; k++) {
+      if (N & (1 << k)) {
+         nodeIndex = par[k][nodeIndex];
+         if (nodeIndex == -1) break;
+      }
+   }
+   return nodeIndex;
+}
+
 class AhoCorasick {
 private:
    struct AhoNode {
@@ -78,20 +144,29 @@ public:
 AhoCorasick aho;
 
 long long solve(const string& pattern) {
-   vector<long long> DP(pattern.size() + 1, 0); // DP[i] = number of ways to match the prefix of length i
-   DP[0] = 1; // 1 way to match an empty prefix
    int curr = 0;
+   Trie* node = &root;
 
    for (size_t i = 0; i < pattern.size(); i++) {
       char c = pattern[i];
       curr = aho.nextState(curr, c); // Transition in the automaton
-      for (int length : aho.getOutputs(curr)) {
-         if (i + 1 - length >= 0)
-            DP[i + 1] += DP[i + 1 - length];
+      node = node->children[c - 'a'].get();
+
+      // Check if DP is known for the current node, if not compute it
+      if (node->DP == -1) {
+         node->DP = 0;
+         auto& ahoOutputs = aho.getOutputs(curr);
+         for (int length : ahoOutputs) {
+            int parentIdx = getNthParent(node->idx, length);
+
+            if (parentIdx != -1) {
+               node->DP += flatTrie[parentIdx]->DP;
+            }
+         }
       }
    }
 
-   return DP[pattern.size()];
+   return node->DP;
 }
 
 int main() {
@@ -100,7 +175,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("in.txt", "r", stdin);
+   freopen("aoc-2024-day-19-challenge-3.txt", "r", stdin);
 
    string line;
    getline(cin, line);
@@ -120,17 +195,29 @@ int main() {
 
    aho.build();
 
+   flatTrie.reserve(1e6);
+   flatTrie.push_back(&root);
+
    long long ans = 0;
-   while (cin >> word) {
-      ans += solve(word);
+   string pattern;
+   while (cin >> pattern) {
+      patterns.push_back(pattern);
+      root.insert(pattern);
    }
 
-   cout << ans << "\n";
+   computeAncestors();
+
+   root.DP = 1; // 1 way to match an empty prefix
+
+   for (auto& pattern : patterns) {
+      ans += solve(pattern);
+   }
 
    auto stop = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(stop - start);
 
-   cout << "Time: " << duration.count() << " ms\n";
+   cout << ans << endl;
+   cout << "Time taken: " << duration.count() << " milliseconds" << endl;
 
    return 0;
 }
