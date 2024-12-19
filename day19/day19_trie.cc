@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
 class Trie {
 public:
@@ -48,6 +50,8 @@ int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
+   auto start = high_resolution_clock::now();
+
    freopen("in.txt", "r", stdin);
 
    string line, word;
@@ -56,8 +60,6 @@ int main() {
    while (getline(stream, word, ',')) {
       word.erase(0, word.find_first_not_of(' '));
       word.erase(word.find_last_not_of(' ') + 1);
-
-      cout << word << endl;
 
       if (!word.empty()) {
          dictionary->insert(word);
@@ -70,7 +72,11 @@ int main() {
       ans += solve(0, word);
    }
 
+   auto stop = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(stop - start);
+
    cout << ans << endl;
+   cout << "Time: " << duration.count() << " ms" << endl;
 
    return 0;
 }
