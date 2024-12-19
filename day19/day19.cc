@@ -37,7 +37,7 @@ long long solve(const int idx, const string& word) {
    long long tot = 0;
 
    int node = 0;
-   for (int i = idx; i < word.size(); i++) {
+   for (size_t i = idx; i < word.size(); i++) {
       char c = word[i];
 
       if (trie[node].children[c - 'a'] == -1) break;
