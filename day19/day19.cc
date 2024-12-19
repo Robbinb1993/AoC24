@@ -13,7 +13,7 @@ struct TrieNode {
 };
 
 const int MAXN = 500000;
-vector<TrieNode> trie(MAXN);
+TrieNode trie[MAXN];
 int trieNodeCount = 1;
 
 void insert(const string& word) {
@@ -81,7 +81,6 @@ int main() {
    while (cin >> word) {
       DP.assign(word.size(), -1);
       ans += solve(0, word);
-      cout << ans << endl;
    }
 
    auto stop = high_resolution_clock::now();
