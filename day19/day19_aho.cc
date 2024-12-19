@@ -65,8 +65,8 @@ public:
    }
 
    long long solve(const string& pattern) {
-      vector<long long> DP(pattern.size() + 1, 0);
-      DP[0] = 1;
+      vector<long long> DP(pattern.size() + 1, 0); //DP[i] = number of ways to match prefix of length i
+      DP[0] = 1; //1 way to match empty prefix (add nothing)
       int curr = 0;
 
       for (int i = 0; i < (int)pattern.size(); i++) {
