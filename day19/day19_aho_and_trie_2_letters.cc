@@ -3,82 +3,63 @@
 using namespace std;
 using namespace chrono;
 
-class Trie;
-
-vector<string> patterns;
-vector<Trie*> flatTrie;
-int trieNodeCount = 1;
-
-class Trie {
-public:
-   unique_ptr<Trie> children[26];
-   Trie* parent;                 // Pointer to the parent node
-   vector<Trie*> ancestors;      // Binary lifting table
-   long long DP;                 // DP value for this node
-   int idx;
-
-   Trie() : parent(nullptr), DP(-1), idx(0) {}
-
-   void insert(const string& word) {
-      Trie* node = this;
-      for (char c : word) {
-         if (!node->children[c - 'a']) {
-            node->children[c - 'a'] = make_unique<Trie>();
-            Trie* newNode = node->children[c - 'a'].get();
-            newNode->parent = node;
-            newNode->idx = trieNodeCount++;
-            flatTrie.push_back(newNode);
-         }
-         node = node->children[c - 'a'].get();
-      }
-   }
+struct TrieNode {
+   int left = -1;
+   int right = -1;
+   int parent = -1;
+   long long DP = -1;
 };
 
-Trie root;
+array<TrieNode, 500000> flatTrie;
 vector<vector<int>> par;
+int trieNodeCount = 0;
 int LOGN;
 
-void computeAncestors() {
-   LOGN = ceil(log2(trieNodeCount)) + 1;
-   par.assign(LOGN, vector<int>(trieNodeCount, -1));
-
-   for (Trie* node : flatTrie) {
-      if (node->parent) {
-         par[0][node->idx] = node->parent->idx; // 2^0 ancestor
+void insert(const string& word) {
+   int node = 0; // Start at the root (index 0)
+   for (char c : word) {
+      int& child = (c == 'u') ? flatTrie[node].left : flatTrie[node].right;
+      if (child == -1) {
+         child = ++trieNodeCount;
+         flatTrie[child].parent = node;
       }
+      node = child;
+   }
+}
+
+void computeAncestors() {
+   LOGN = ceil(log2(trieNodeCount + 1)) + 1;
+   par.assign(trieNodeCount + 1, vector<int>(LOGN, -1));
+
+   for (int node = 1; node <= trieNodeCount; node++) {
+      par[node][0] = flatTrie[node].parent; // Immediate parent
    }
 
-   // Binary lifting for higher levels
    for (int k = 1; k < LOGN; k++) {
-      for (int i = 0; i < trieNodeCount; i++) {
-         if (par[k - 1][i] != -1) {
-            par[k][i] = par[k - 1][par[k - 1][i]];
-         }
+      for (int node = 1; node <= trieNodeCount; node++) {
+         int mid = par[node][k - 1];
+         par[node][k] = (mid == -1) ? -1 : par[mid][k - 1];
       }
    }
 }
 
-//Get N'th parent in O(log(N)) time using binary lifting
-int getNthParent(int nodeIndex, int N) {
-   for (int k = 0; k < LOGN; k++) {
+// Function to get the N'th parent using binary lifting
+int getNthParent(int node, int N) {
+   for (int k = 0; k < LOGN && node != -1; k++) {
       if (N & (1 << k)) {
-         nodeIndex = par[k][nodeIndex];
-         if (nodeIndex == -1) break;
+         node = par[node][k];
       }
    }
-   return nodeIndex;
+   return node;
 }
 
 class AhoCorasick {
 private:
    struct AhoNode {
-      array<int, 26> next;
-      int fail;
-      vector<int> out;
-      AhoNode() {
-         next.fill(-1);
-         fail = -1;
-      }
+      int next[2]; // Transitions for 'u' and 'w'
+      int fail;    // Failure link
+      vector<int> out; // Output lengths
+      AhoNode() : fail(-1) { next[0] = next[1] = -1; }
    };
 
    vector<AhoNode> automaton;
@@ -89,7 +70,7 @@ public:
    void insert(const string& word) {
       int curr = 0;
       for (char c : word) {
-         int idx = c - 'a';
+         int idx = (c == 'u') ? 0 : 1;
          if (automaton[curr].next[idx] == -1) {
             automaton[curr].next[idx] = (int)automaton.size();
             automaton.push_back(AhoNode());
@@ -101,7 +82,7 @@ public:
 
    void build() {
       queue<int> Q;
-      for (int c = 0; c < 26; c++) {
+      for (int c = 0; c < 2; c++) {
          int nxt = automaton[0].next[c];
          if (nxt != -1) {
             automaton[nxt].fail = 0;
@@ -113,13 +94,15 @@ public:
       }
 
       while (!Q.empty()) {
-         int u = Q.front(); Q.pop();
+         int u = Q.front();
+         Q.pop();
          int f = automaton[u].fail;
 
          for (auto& length : automaton[f].out) {
             automaton[u].out.push_back(length);
          }
-         for (int c = 0; c < 26; c++) {
+
+         for (int c = 0; c < 2; c++) {
             int nxt = automaton[u].next[c];
             if (nxt != -1) {
                automaton[nxt].fail = automaton[f].next[c];
@@ -133,7 +116,7 @@ public:
    }
 
    int nextState(const int curr, const char c) const {
-      return automaton[curr].next[c - 'a'];
+      return automaton[curr].next[c == 'u' ? 0 : 1];
    }
 
    const vector<int>& getOutputs(const int state) const {
@@ -145,28 +128,26 @@ AhoCorasick aho;
 
 long long solve(const string& pattern) {
    int curr = 0;
-   Trie* node = &root;
+   int node = 0;
 
-   for (size_t i = 0; i < pattern.size(); i++) {
-      char c = pattern[i];
+   for (char c : pattern) {
       curr = aho.nextState(curr, c); // Transition in the automaton
-      node = node->children[c - 'a'].get();
+      node = (c == 'u') ? flatTrie[node].left : flatTrie[node].right;
+      if (node == -1) return 0;
 
-      // Check if DP is known for the current node, if not compute it
-      if (node->DP == -1) {
-         node->DP = 0;
+      if (flatTrie[node].DP == -1) {
+         flatTrie[node].DP = 0;
          auto& ahoOutputs = aho.getOutputs(curr);
          for (int length : ahoOutputs) {
-            int parentIdx = getNthParent(node->idx, length);
-
+            int parentIdx = getNthParent(node, length);
             if (parentIdx != -1) {
-               node->DP += flatTrie[parentIdx]->DP;
+               flatTrie[node].DP += flatTrie[parentIdx].DP;
             }
          }
       }
    }
 
-   return node->DP;
+   return flatTrie[node].DP;
 }
 
 int main() {
@@ -183,10 +164,11 @@ int main() {
    istringstream ss(line);
    string word;
 
+   vector<string> patterns;
+
    while (getline(ss, word, ',')) {
       size_t start = word.find_first_not_of(" ");
       size_t end = word.find_last_not_of(" ");
-
       if (start != string::npos) {
          word = word.substr(start, end - start + 1);
          aho.insert(word);
@@ -195,21 +177,20 @@ int main() {
 
    aho.build();
 
-   flatTrie.reserve(1e6);
-   flatTrie.push_back(&root);
+   flatTrie[0] = {};
 
-   long long ans = 0;
    string pattern;
    while (cin >> pattern) {
       patterns.push_back(pattern);
-      root.insert(pattern);
+      insert(pattern);
    }
 
    computeAncestors();
 
-   root.DP = 1; // 1 way to match an empty prefix
+   flatTrie[0].DP = 1;
 
-   for (auto& pattern : patterns) {
+   long long ans = 0;
+   for (const auto& pattern : patterns) {
       ans += solve(pattern);
    }
 
