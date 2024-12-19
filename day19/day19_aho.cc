@@ -75,7 +75,9 @@ public:
    }
 };
 
-long long solve(const AhoCorasick& aho, const string& pattern) {
+AhoCorasick aho;
+
+long long solve(const string& pattern) {
    vector<long long> DP(pattern.size() + 1, 0); // DP[i] = number of ways to match the prefix of length i
    DP[0] = 1; // 1 way to match an empty prefix
    int curr = 0;
@@ -106,8 +108,6 @@ int main() {
    istringstream stream(line);
    string word;
 
-   AhoCorasick aho;
-
    while (getline(stream, word, ',')) {
       while (!word.empty() && isspace((unsigned char)word.front())) word.erase(word.begin());
       while (!word.empty() && isspace((unsigned char)word.back())) word.pop_back();
@@ -121,7 +121,7 @@ int main() {
 
    long long ans = 0;
    while (cin >> word) {
-      ans += solve(aho, word);
+      ans += solve(word);
    }
 
    cout << ans << "\n";
