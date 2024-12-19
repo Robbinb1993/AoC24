@@ -73,6 +73,8 @@ void fastInput() {
    bool isX = true;
    pair<int, int> currentPair;
 
+   freopen("aoc-2024-day-18-challenge-3-2500x2500.txt", "r", stdin);
+
    //Use getchar_unlocked on Linux
    while ((c = _getchar_nolock()) != EOF) {
       if (c >= '0' && c <= '9') {
@@ -100,8 +102,6 @@ void fastInput() {
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
-
-   freopen("aoc-2024-day-18-challenge-3-2500x2500.txt", "r", stdin);
 
    auto start = high_resolution_clock::now();
 
