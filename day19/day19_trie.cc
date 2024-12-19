@@ -21,8 +21,7 @@ public:
 
 unique_ptr<Trie> dictionary = make_unique<Trie>();
 
-long long DP[100];
-
+vector<long long> DP;
 long long solve(const int idx, const string& word) {
    if (idx == word.size()) return 1;
 
@@ -67,7 +66,7 @@ int main() {
 
    long long ans = 0;
    while (cin >> word) {
-      memset(DP, -1, sizeof(DP));
+      DP.assign(word.size(), -1);
       ans += solve(0, word);
    }
 
