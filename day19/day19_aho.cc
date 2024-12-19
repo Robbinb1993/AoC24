@@ -15,50 +15,50 @@ struct AhoNode {
 
 class AhoCorasick {
 public:
-   vector<AhoNode> trie;
-   AhoCorasick() { trie.push_back(AhoNode()); }
+   vector<AhoNode> automaton;
+   AhoCorasick() { automaton.push_back(AhoNode()); }
 
    void insert(const string& word) {
       int cur = 0;
       for (char c : word) {
          int idx = c - 'a';
-         if (trie[cur].next[idx] == -1) {
-            trie[cur].next[idx] = (int)trie.size();
-            trie.push_back(AhoNode());
+         if (automaton[cur].next[idx] == -1) {
+            automaton[cur].next[idx] = (int)automaton.size();
+            automaton.push_back(AhoNode());
          }
-         cur = trie[cur].next[idx];
+         cur = automaton[cur].next[idx];
       }
-      trie[cur].out.push_back((int)word.size());
+      automaton[cur].out.push_back((int)word.size());
    }
 
    void build() {
       queue<int>q;
       for (int c = 0; c < 26; c++) {
-         int nxt = trie[0].next[c];
+         int nxt = automaton[0].next[c];
          if (nxt != -1) {
-            trie[nxt].fail = 0;
+            automaton[nxt].fail = 0;
             q.push(nxt);
          }
          else {
-            trie[0].next[c] = 0;
+            automaton[0].next[c] = 0;
          }
       }
 
       while (!q.empty()) {
          int u = q.front(); q.pop();
-         int f = trie[u].fail;
+         int f = automaton[u].fail;
 
-         for (auto& length : trie[f].out) {
-            trie[u].out.push_back(length);
+         for (auto& length : automaton[f].out) {
+            automaton[u].out.push_back(length);
          }
          for (int c = 0; c < 26; c++) {
-            int nxt = trie[u].next[c];
+            int nxt = automaton[u].next[c];
             if (nxt != -1) {
-               trie[nxt].fail = trie[f].next[c];
+               automaton[nxt].fail = automaton[f].next[c];
                q.push(nxt);
             }
             else {
-               trie[u].next[c] = trie[f].next[c];
+               automaton[u].next[c] = automaton[f].next[c];
             }
          }
       }
@@ -71,8 +71,8 @@ public:
 
       for (int i = 0; i < (int)pattern.size(); i++) {
          int c = pattern[i] - 'a';
-         curr = trie[curr].next[c];
-         for (int length : trie[curr].out) {
+         curr = automaton[curr].next[c];
+         for (int length : automaton[curr].out) {
             if (i + 1 - length >= 0)
                DP[i + 1] += DP[i + 1 - length];
          }
