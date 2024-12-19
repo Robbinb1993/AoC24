@@ -102,6 +102,7 @@ public:
 
          for (int c = 0; c < 2; c++) {
             int nxt = automaton[u].next[c];
+
             if (nxt != -1) {
                automaton[nxt].fail = automaton[f].next[c];
                Q.push(nxt);
@@ -180,6 +181,9 @@ int main() {
    string pattern;
    while (cin >> pattern) {
       patterns.push_back(pattern);
+   }
+
+   for (auto& pattern : patterns) {
       insert(pattern);
    }
 
