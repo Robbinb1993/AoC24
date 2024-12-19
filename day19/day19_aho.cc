@@ -66,23 +66,31 @@ public:
       }
    }
 
-   long long solve(const string& pattern) {
-      vector<long long> DP(pattern.size() + 1, 0); //DP[i] = number of ways to match prefix of length i
-      DP[0] = 1; //1 way to match empty prefix (add nothing)
-      int curr = 0;
+   int nextState(int curr, char c) const {
+      return automaton[curr].next[c - 'a'];
+   }
 
-      for (int i = 0; i < (int)pattern.size(); i++) {
-         int c = pattern[i] - 'a';
-         curr = automaton[curr].next[c];
-         for (int length : automaton[curr].out) {
-            if (i + 1 - length >= 0)
-               DP[i + 1] += DP[i + 1 - length];
-         }
-      }
-
-      return DP[pattern.size()];
+   const vector<int>& getOutputs(int state) const {
+      return automaton[state].out;
    }
 };
+
+long long solve(const AhoCorasick& aho, const string& pattern) {
+   vector<long long> DP(pattern.size() + 1, 0); // DP[i] = number of ways to match the prefix of length i
+   DP[0] = 1; // 1 way to match an empty prefix
+   int curr = 0;
+
+   for (int i = 0; i < (int)pattern.size(); i++) {
+      char c = pattern[i];
+      curr = aho.nextState(curr, c); // Transition in the automaton
+      for (int length : aho.getOutputs(curr)) {
+         if (i + 1 - length >= 0)
+            DP[i + 1] += DP[i + 1 - length];
+      }
+   }
+
+   return DP[pattern.size()];
+}
 
 int main() {
    ios_base::sync_with_stdio(false);
@@ -113,7 +121,7 @@ int main() {
 
    long long ans = 0;
    while (cin >> word) {
-      ans += aho.solve(word);
+      ans += solve(aho, word);
    }
 
    cout << ans << "\n";
