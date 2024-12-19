@@ -61,8 +61,8 @@ int main() {
    string word;
 
    while (getline(ss, word, ',')) {
-      size_t start = word.find_first_not_of(" \t");
-      size_t end = word.find_last_not_of(" \t");
+      size_t start = word.find_first_not_of(" ");
+      size_t end = word.find_last_not_of(" ");
 
       if (start != string::npos) {
          word = word.substr(start, end - start + 1);
