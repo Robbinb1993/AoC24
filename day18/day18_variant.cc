@@ -5,7 +5,6 @@ using namespace chrono;
 
 const int N = 2501;
 const int M = 2501;
-const int INF = 1e9;
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
 
