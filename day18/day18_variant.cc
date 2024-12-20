@@ -11,16 +11,17 @@ const int DY[4] = {0, 1, 0, -1};
 
 vector<pair<int, int>> bytes;
 bool seen[N][M];
+bool touchingSeen[N][M];
 char grid[N][M];
 
 bool floodFill(const int startX, const int startY) {
-   stack<pair<int, int>> stk;
-   stk.push({startX, startY});
+   vector<pair<int, int>> stk;
+   stk.emplace_back(startX, startY);
    seen[startX][startY] = true;
 
    while (!stk.empty()) {
-      auto [x, y] = stk.top();
-      stk.pop();
+      auto [x, y] = stk.back();
+      stk.pop_back();
 
       if (x == 0 && y == 0)
          return true;
@@ -29,9 +30,14 @@ bool floodFill(const int startX, const int startY) {
          int nx = x + DX[i];
          int ny = y + DY[i];
 
-         if (nx >= 0 && nx < N && ny >= 0 && ny < M && !seen[nx][ny] && grid[nx][ny] == '.') {
-            seen[nx][ny] = true;
-            stk.push({nx, ny});
+         if (nx >= 0 && nx < N && ny >= 0 && ny < M && !seen[nx][ny]) {
+            if (grid[nx][ny] == '.') {
+               seen[nx][ny] = true;
+               stk.emplace_back(nx, ny);
+            }
+            else {
+               touchingSeen[nx][ny] = true;
+            }
          }
       }
    }
@@ -51,14 +57,12 @@ int solve() {
 
    floodFill(N - 1, M - 1);
 
-   for (int i = int(bytes.size()) - 1; i >= 0; i--) {
+   for (size_t i = bytes.size() - 1; i >= 0; i--) {
       auto [x, y] = bytes[i];
       grid[x][y] = '.';
 
       for (int j = 0; j < 4; j++) {
-         int nx = x + DX[j];
-         int ny = y + DY[j];
-         if (nx >= 0 && nx < N && ny >= 0 && ny < M && seen[nx][ny] && floodFill(x, y)) {
+         if (touchingSeen[x][y] && floodFill(x, y)) {
             return i;
          }
       }
@@ -73,7 +77,7 @@ void fastInput() {
    bool isX = true;
    pair<int, int> currentPair;
 
-   freopen("aoc-2024-day-18-challenge-3-2500x2500.txt", "r", stdin);
+   freopen("aoc-2024-day-18-challenge-4-2500x2500.txt", "r", stdin);
 
    //Use getchar_unlocked on Linux
    while ((c = _getchar_nolock()) != EOF) {
