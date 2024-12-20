@@ -3,14 +3,12 @@ using namespace std;
 
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
-const int INF = 1e9;
 const int MAX_CHEAT_DIST = 20;
 const int DIST_DIFF_REQ = 100;
 
 int N, M;
 vector<vector<char>> grid;
 vector<vector<int>> distStart, distEnd;
-vector<vector<bool>> cheated;
 
 int BFS(const int sx, const int sy, const int ex, const int ey, vector<vector<int>>& dist) {
    dist.assign(N, vector<int>(M, -1));
