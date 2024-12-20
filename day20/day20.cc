@@ -42,7 +42,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-20-challenge-7.txt", "r", stdin);
+   freopen("aoc-2024-day-20-challenge-6.txt", "r", stdin);
    string line;
    while (getline(cin, line)) {
       grid.push_back(vector<char>(line.begin(), line.end()));
@@ -78,7 +78,9 @@ int main() {
             }
             for (int k = -MAX_CHEAT_DIST; k <= MAX_CHEAT_DIST; k++) {
                int kDist = abs(k);
-               for (int l = -MAX_CHEAT_DIST + kDist; l <= MAX_CHEAT_DIST - kDist; l++) {
+               int from = -MAX_CHEAT_DIST + kDist;
+               int to = MAX_CHEAT_DIST - kDist;
+               for (int l = from; l <= to; l++) {
                   int nx = i + k;
                   int ny = j + l;
 
