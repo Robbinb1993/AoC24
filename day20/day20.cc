@@ -1,9 +1,10 @@
 #include <bits/stdc++.h>
+#include <chrono>
 using namespace std;
+using namespace chrono;
 
 const int DX[4] = {-1, 0, 1, 0};
 const int DY[4] = {0, 1, 0, -1};
-const int MAX_CHEAT_DIST = 20;
 const int DIST_DIFF_REQ = 100;
 
 int N, M;
@@ -39,7 +40,9 @@ int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
 
-   freopen("in.txt", "r", stdin);
+   auto start = high_resolution_clock::now();
+
+   freopen("aoc-2024-day-20-challenge-7.txt", "r", stdin);
    string line;
    while (getline(cin, line)) {
       grid.push_back(vector<char>(line.begin(), line.end()));
@@ -65,38 +68,49 @@ int main() {
    int minDist = BFS(sx, sy, ex, ey, distStart);
    BFS(ex, ey, sx, sy, distEnd);
 
-   int ans = 0;
-   for (int i = 0; i < N; i++) {
-      for (int j = 0; j < M; j++) {
-         if (grid[i][j] == '#') {
-            continue;
-         }
-         for (int k = -MAX_CHEAT_DIST; k <= MAX_CHEAT_DIST; k++) {
-            int kDist = abs(k);
-            for (int l = -MAX_CHEAT_DIST + kDist; l <= MAX_CHEAT_DIST - kDist; l++) {
-               int nx = i + k;
-               int ny = j + l;
+   for (int part = 1; part <= 2; part++) {
+      int ans = 0;
+      int MAX_CHEAT_DIST = part == 1 ? 2 : 20;
+      for (int i = 0; i < N; i++) {
+         for (int j = 0; j < M; j++) {
+            if (grid[i][j] == '#') {
+               continue;
+            }
+            int ctr = 0;
+            for (int k = -MAX_CHEAT_DIST; k <= MAX_CHEAT_DIST; k++) {
+               int kDist = abs(k);
+               for (int l = -MAX_CHEAT_DIST + kDist; l <= MAX_CHEAT_DIST - kDist; l++) {
+                  ctr++;
+                  int nx = i + k;
+                  int ny = j + l;
 
-               if (nx < 0 || nx >= N || ny < 0 || ny >= M || grid[nx][ny] == '#') {
-                  continue;
-               }
+                  if (nx < 0 || nx >= N || ny < 0 || ny >= M || grid[nx][ny] == '#') {
+                     continue;
+                  }
 
-               int dist = abs(nx - i) + abs(ny - j);
+                  int dist = abs(nx - i) + abs(ny - j);
 
-               if (dist == 0 || dist > MAX_CHEAT_DIST || distStart[i][j] == -1 || distEnd[nx][ny] == -1) {
-                  continue;
-               }
+                  if (dist == 0 || dist > MAX_CHEAT_DIST || distStart[i][j] == -1 || distEnd[nx][ny] == -1) {
+                     continue;
+                  }
 
-               int currDist = distStart[i][j] + dist + distEnd[nx][ny];
-               if (minDist - currDist >= DIST_DIFF_REQ) {
-                  ans++;
+                  int currDist = distStart[i][j] + dist + distEnd[nx][ny];
+                  if (minDist - currDist >= DIST_DIFF_REQ) {
+                     ans++;
+                  }
                }
             }
+            cout << ctr << endl;
          }
       }
+
+      cout << ans << endl;
    }
 
-   cout << ans << endl;
+   auto stop = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(stop - start);
+
+   cout << duration.count() << "ms" << endl;
 
    return 0;
 }
