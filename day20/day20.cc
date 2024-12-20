@@ -73,7 +73,7 @@ int main() {
       int MAX_CHEAT_DIST = part == 1 ? 2 : 20;
       for (int x = 0; x < N; x++) {
          for (int y = 0; y < M; y++) {
-            if (grid[x][y] == '#') {
+            if (grid[x][y] == '#' || distStart[x][y] == -1) {
                continue;
             }
             for (int dx = -MAX_CHEAT_DIST; dx <= MAX_CHEAT_DIST; dx++) {
@@ -91,7 +91,7 @@ int main() {
                      continue;
                   }
 
-                  if (distStart[x][y] == -1 || distEnd[nx][ny] == -1) {
+                  if (distEnd[nx][ny] == -1) {
                      continue;
                   }
 
