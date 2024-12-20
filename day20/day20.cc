@@ -42,7 +42,7 @@ int main() {
 
    auto start = high_resolution_clock::now();
 
-   freopen("aoc-2024-day-20-challenge-3.txt", "r", stdin);
+   freopen("aoc-2024-day-20-challenge-2.txt", "r", stdin);
    string line;
    while (getline(cin, line)) {
       grid.push_back(vector<char>(line.begin(), line.end()));
@@ -71,32 +71,32 @@ int main() {
    for (int part = 1; part <= 2; part++) {
       int ans = 0;
       int MAX_CHEAT_DIST = part == 1 ? 2 : 20;
-      for (int i = 0; i < N; i++) {
-         for (int j = 0; j < M; j++) {
-            if (grid[i][j] == '#') {
+      for (int x = 0; x < N; x++) {
+         for (int y = 0; y < M; y++) {
+            if (grid[x][y] == '#') {
                continue;
             }
-            for (int k = -MAX_CHEAT_DIST; k <= MAX_CHEAT_DIST; k++) {
-               int kDist = abs(k);
+            for (int dx = -MAX_CHEAT_DIST; dx <= MAX_CHEAT_DIST; dx++) {
+               int kDist = abs(dx);
                int from = -MAX_CHEAT_DIST + kDist;
                int to = MAX_CHEAT_DIST - kDist;
-               for (int l = from; l <= to; l++) {
-                  if (k == 0 && l == 0) {
+               for (int dy = from; dy <= to; dy++) {
+                  if (dx == 0 && dy == 0) {
                      continue;
                   }
-                  int nx = i + k;
-                  int ny = j + l;
+                  int nx = x + dx;
+                  int ny = y + dy;
 
                   if (nx < 0 || nx >= N || ny < 0 || ny >= M || grid[nx][ny] == '#') {
                      continue;
                   }
 
-                  if (distStart[i][j] == -1 || distEnd[nx][ny] == -1) {
+                  if (distStart[x][y] == -1 || distEnd[nx][ny] == -1) {
                      continue;
                   }
 
-                  int dist = abs(k) + abs(l);
-                  int currDist = distStart[i][j] + dist + distEnd[nx][ny];
+                  int dist = abs(dx) + abs(dy);
+                  int currDist = distStart[x][y] + dist + distEnd[nx][ny];
                   if (minDist - currDist >= DIST_DIFF_REQ) {
                      ans++;
                   }
