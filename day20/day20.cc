@@ -76,11 +76,9 @@ int main() {
             if (grid[i][j] == '#') {
                continue;
             }
-            int ctr = 0;
             for (int k = -MAX_CHEAT_DIST; k <= MAX_CHEAT_DIST; k++) {
                int kDist = abs(k);
                for (int l = -MAX_CHEAT_DIST + kDist; l <= MAX_CHEAT_DIST - kDist; l++) {
-                  ctr++;
                   int nx = i + k;
                   int ny = j + l;
 
@@ -100,7 +98,6 @@ int main() {
                   }
                }
             }
-            cout << ctr << endl;
          }
       }
 
