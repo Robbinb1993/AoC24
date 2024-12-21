@@ -101,7 +101,7 @@ long long solve(const int from, const int to, const int level) {
    for (auto& path : minPaths[from][to]) {
       //After the previous move has been performed a layer higher, the current robot will be at the 'A' position.
       //We know this is true as he had to perform the actual move of the robot a layer higher by pressing the 'A' key 
-      //on the keypad. 
+      //on the keypad at the end. 
       //If the first move is yet to be performed, we know the robot will be at the starting position 'A' aswell.
       //Thus we should always first move the current robot from 'A' to the start of the next path.
       long long currDist = solve(moveId['A'], moveId[path[0]], level + 1);
