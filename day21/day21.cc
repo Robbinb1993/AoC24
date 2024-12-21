@@ -115,6 +115,8 @@ int main() {
 
    init();
 
+   auto start = chrono::high_resolution_clock::now();
+
    freopen("in.txt", "r", stdin);
 
    vector<string> codes;
@@ -144,7 +146,11 @@ int main() {
       ans += codeVal * totDist;
    }
 
+   auto end = chrono::high_resolution_clock::now();
+   auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+
    cout << ans << endl;
+   cout << "Time: " << duration.count() << " ms" << endl;
 
    return 0;
 }
