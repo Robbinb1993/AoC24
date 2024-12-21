@@ -15,7 +15,7 @@ int BFS(const int sx, const int sy, const int ex, const int ey, vector<vector<in
    dist.assign(N, vector<int>(M, -1));
 
    queue<pair<int, int>> Q;
-   Q.push({sx, sy});
+   Q.emplace(sx, sy);
    dist[sx][sy] = 0;
 
    while (!Q.empty()) {
@@ -28,7 +28,7 @@ int BFS(const int sx, const int sy, const int ex, const int ey, vector<vector<in
 
          if (nx >= 0 && nx < grid.size() && ny >= 0 && ny < grid[0].size() && grid[nx][ny] != '#' && dist[nx][ny] == -1) {
             dist[nx][ny] = dist[x][y] + 1;
-            Q.push({nx, ny});
+            Q.emplace(nx, ny);
          }
       }
    }
@@ -71,29 +71,26 @@ int main() {
    for (int part = 1; part <= 2; part++) {
       int ans = 0;
       int MAX_CHEAT_DIST = part == 1 ? 2 : 20;
+
+      vector<int> dxRange(2 * MAX_CHEAT_DIST + 1);
+      iota(dxRange.begin(), dxRange.end(), -MAX_CHEAT_DIST);
+#pragma omp parallel for reduction(+:ans) schedule(dynamic)
       for (int x = 0; x < N; x++) {
          for (int y = 0; y < M; y++) {
-            if (distStart[x][y] == -1) {
-               continue;
-            }
-            for (int dx = -MAX_CHEAT_DIST; dx <= MAX_CHEAT_DIST; dx++) {
+            if (distStart[x][y] == -1) continue;
+
+            for (int dx : dxRange) {
                int xDist = abs(dx);
                int from = -MAX_CHEAT_DIST + xDist;
                int to = MAX_CHEAT_DIST - xDist;
+
                for (int dy = from; dy <= to; dy++) {
-                  if (dx == 0 && dy == 0) {
-                     continue;
-                  }
+                  if (dx == 0 && dy == 0) continue;
                   int nx = x + dx;
                   int ny = y + dy;
 
-                  if (nx < 0 || nx >= N || ny < 0 || ny >= M || grid[nx][ny] == '#') {
-                     continue;
-                  }
-
-                  if (distEnd[nx][ny] == -1) {
-                     continue;
-                  }
+                  if (nx < 0 || nx >= N || ny < 0 || ny >= M || grid[nx][ny] == '#') continue;
+                  if (distEnd[nx][ny] == -1) continue;
 
                   int dist = xDist + abs(dy);
                   int currDist = distStart[x][y] + dist + distEnd[nx][ny];
@@ -105,7 +102,7 @@ int main() {
          }
       }
 
-      cout << ans << endl;
+      cout << "Part " << part << ": " << ans << endl;
    }
 
    auto stop = high_resolution_clock::now();
