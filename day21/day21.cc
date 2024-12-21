@@ -105,7 +105,7 @@ long long solve(const int from, const int to, const int level) {
       //If the first move is yet to be performed, we know the robot will be at the starting position 'A' aswell.
       //Thus we should always first move the current robot from 'A' to the start of the next path.
       long long currDist = solve(moveId['A'], moveId[path[0]], level + 1);
-      //Now we will reposition the robot a layer higher to the next move required and press 'A' at the end 
+      //Now we will reposition the robot a layer higher to the next move required and press 'A' at the end again (every path ends with 'A').
       for (int i = 0; i < int(path.size()) - 1; i++) {
          currDist += solve(moveId[path[i]], moveId[path[i + 1]], level + 1);
       }
