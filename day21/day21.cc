@@ -100,7 +100,7 @@ long long solve(const int from, const int to, const int level) {
    long long bestDist = INF;
    for (auto& path : minPaths[from][to]) {
       //After every previous move performed a layer higher, the current robot will be at the 'A' position as he had to 
-      //perform the actual move of the robot 2 layers up by pressing the 'A' key on the keypad. If the first move is yet 
+      //perform the actual move of the robot a layer up by pressing the 'A' key on the keypad. If the first move is yet 
       //to be performed, we know the robot will be at the starting position 'A' aswell.
       long long currDist = solve(moveId['A'], moveId[path[0]], level + 1);
       //Now we will reposition the robot a layer higher to the next move required and press 'A' at the end 
