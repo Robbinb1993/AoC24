@@ -24,6 +24,10 @@ int calculateIndex(int i, int j, int k, int l) {
    return ((i + 9) * 19 * 19 * 19) + ((j + 9) * 19 * 19) + ((k + 9) * 19) + (l + 9);
 }
 
+int sum[130321];
+int seen[130321];
+int seenItr;
+
 int main() {
    ios_base::sync_with_stdio(false);
    cin.tie(NULL);
@@ -41,9 +45,8 @@ int main() {
 
    long long ans = 0;
 
-   vector<vector<int>> mp(secretNumbers.size(), vector<int>(130321, -1));
-
    for (size_t s = 0; s < secretNumbers.size(); s++) {
+      seenItr++;
       int secret = secretNumbers[s];
       vector<int> secretList;
       secretList.push_back(secret);
@@ -52,6 +55,7 @@ int main() {
          secretList.push_back(secret);
       }
 
+
       for (size_t i = 4; i < secretList.size(); i++) {
          int index = calculateIndex(
             secretList[i - 3] % 10 - secretList[i - 4] % 10,
@@ -59,25 +63,11 @@ int main() {
             secretList[i - 1] % 10 - secretList[i - 2] % 10,
             secretList[i] % 10 - secretList[i - 1] % 10);
 
-         if (mp[s][index] == -1) {
-            mp[s][index] = secretList[i] % 10;
-         }
-      }
-   }
-
-   int best = 0;
-   for (int i = -9; i <= 9; i++) {
-      for (int j = -9; j <= 9; j++) {
-         for (int k = -9; k <= 9; k++) {
-            for (int l = -9; l <= 9; l++) {
-               int index = calculateIndex(i, j, k, l);
-               int curr = 0;
-               for (size_t m = 0; m < mp.size(); m++) {
-                  if (mp[m][index] != -1) {
-                     curr += mp[m][index];
-                  }
-               }
-               best = max(best, curr);
+         if (seen[index] != seenItr) {
+            sum[index] += secretList[i] % 10;
+            seen[index] = seenItr;
+            if (sum[index] > ans) {
+               ans = sum[index];
             }
          }
       }
@@ -86,7 +76,7 @@ int main() {
    auto end = high_resolution_clock::now();
    auto duration = duration_cast<milliseconds>(end - start);
 
-   cout << best << endl;
+   cout << ans << endl;
    cout << "Time: " << duration.count() << " ms" << endl;
 
    return 0;
