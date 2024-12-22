@@ -4,6 +4,7 @@ using namespace std;
 using namespace chrono;
 
 const int MOD = 16777216;
+const int POW_19_3 = 19 * 19 * 19;
 
 static int transform(unsigned long long secretNumber) {
     unsigned long long result = secretNumber * 64;
@@ -43,7 +44,7 @@ int main() {
             int price = secret % 10;
             int delta = price - lastPrice;
             lastPrice = price;
-            index = (index % (19 * 19 * 19)) * 19 + (delta + 9);
+            index = (index % (POW_19_3)) * 19 + (delta + 9);
             if (j >= 3 && seen[index] != seenItr) {
                 seen[index] = seenItr;
                 sum[index] += price;
