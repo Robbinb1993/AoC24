@@ -16,9 +16,7 @@ int transform(long long secretNumber) {
    return secretNumber & (MOD - 1);
 }
 
-int calculateIndex(int i, int j, int k, int l) {
-   return ((i + 9) * 19 * 19 * 19) + ((j + 9) * 19 * 19) + ((k + 9) * 19) + (l + 9);
-}
+int powersOf19[4] = {19 * 19 * 19, 19 * 19, 19, 1};
 
 int sum[130321];
 int seen[130321];
@@ -52,12 +50,28 @@ int main() {
          secretList.push_back(secret);
       }
 
+      int window[4] = {
+         0,
+         secretList[1] % 10 - secretList[0] % 10,
+         secretList[2] % 10 - secretList[1] % 10,
+         secretList[3] % 10 - secretList[2] % 10
+      };
+
+      int index = 0;
+      for (int k = 0; k < 4; k++) {
+         index += (window[k] + 9) * powersOf19[k];
+      }
+
       for (size_t i = 4; i < secretList.size(); i++) {
-         int index = calculateIndex(
-            secretList[i - 3] % 10 - secretList[i - 4] % 10,
-            secretList[i - 2] % 10 - secretList[i - 3] % 10,
-            secretList[i - 1] % 10 - secretList[i - 2] % 10,
-            secretList[i] % 10 - secretList[i - 1] % 10);
+         int newPriceDiff = secretList[i] % 10 - secretList[i - 1] % 10;
+         index -= (window[0] + 9) * powersOf19[0];
+         index *= 19;
+         index += (newPriceDiff + 9);
+
+         for (int k = 0; k < 3; k++) {
+            window[k] = window[k + 1];
+         }
+         window[3] = newPriceDiff;
 
          if (seen[index] != seenItr) {
             sum[index] += secretList[i] % 10;
