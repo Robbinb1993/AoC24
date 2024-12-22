@@ -30,7 +30,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("in.txt", "r", stdin);
+    freopen("aoc-2024-day-22-challenge-1.txt", "r", stdin);
 
     long long ans1 = 0, ans2 = 0;
     int secret;
@@ -38,7 +38,7 @@ int main() {
     while (cin >> secret) {
         seenItr++;
         int lastPrice = secret % 10;
-        int index;
+        int index = 0;
         for (int j = 0; j < 2000; j++) {
             secret = transform(secret);
             int price = secret % 10;
