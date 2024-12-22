@@ -45,23 +45,14 @@ void genMinPaths(const int from, const int to, const vector<vector<char>>& pad) 
     int dr = r2 - r1;
     int dc = c2 - c1;
 
-    vector<string> paths;
-
     if (pad[r2][c1] != ' ') {
-        paths.push_back(string(abs(dr), dr > 0 ? 'v' : '^') +
-            string(abs(dc), dc > 0 ? '>' : '<'));
+        minPaths[from][to].push_back(string(abs(dr), dr > 0 ? 'v' : '^') +
+            string(abs(dc), dc > 0 ? '>' : '<') + "A");
     }
 
     if (pad[r1][c2] != ' ') {
-        paths.push_back(string(abs(dc), dc > 0 ? '>' : '<') +
-            string(abs(dr), dr > 0 ? 'v' : '^'));
-    }
-
-    for (const auto& path : paths) {
-        string newPath = path;
-        if (minPaths[from][to].empty() || minPaths[from][to].back() != newPath) {
-            minPaths[from][to].push_back(newPath + "A");
-        }
+        minPaths[from][to].push_back(string(abs(dc), dc > 0 ? '>' : '<') +
+            string(abs(dr), dr > 0 ? 'v' : '^') + "A");
     }
 }
 
