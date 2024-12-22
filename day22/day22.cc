@@ -21,6 +21,15 @@ int powersOf19[4] = {19 * 19 * 19, 19 * 19, 19, 1};
 int sum[130321];
 int seen[130321];
 int seenItr;
+int ans;
+
+void updateAns(const int index, const int value) {
+   if (seen[index] != seenItr) {
+      seen[index] = seenItr;
+      sum[index] += value;
+      ans = max(ans, sum[index]);
+   }
+}
 
 int main() {
    ios_base::sync_with_stdio(false);
@@ -37,8 +46,6 @@ int main() {
       secretNumbers.push_back(secretNumber);
    }
 
-   long long ans = 0;
-
    for (size_t s = 0; s < secretNumbers.size(); s++) {
       seenItr++;
       int secret = secretNumbers[s];
@@ -50,36 +57,19 @@ int main() {
          secretList.push_back(secret);
       }
 
-      int window[4] = {
-         0,
-         secretList[1] % 10 - secretList[0] % 10,
-         secretList[2] % 10 - secretList[1] % 10,
-         secretList[3] % 10 - secretList[2] % 10
-      };
-
       int index = 0;
-      for (int k = 0; k < 4; k++) {
-         index += (window[k] + 9) * powersOf19[k];
+      for (int i = 0; i < 4; i++) {
+         int priceDiff = secretList[i + 1] % 10 - secretList[i] % 10;
+         index += (priceDiff + 9) * powersOf19[i];
       }
 
-      for (size_t i = 4; i < secretList.size(); i++) {
+      updateAns(index, secretList[4] % 10);
+
+      for (size_t i = 5; i < secretList.size(); i++) {
+         int oldPriceDiff = secretList[i - 4] % 10 - secretList[i - 5] % 10;
          int newPriceDiff = secretList[i] % 10 - secretList[i - 1] % 10;
-         index -= (window[0] + 9) * powersOf19[0];
-         index *= 19;
-         index += (newPriceDiff + 9);
-
-         for (int k = 0; k < 3; k++) {
-            window[k] = window[k + 1];
-         }
-         window[3] = newPriceDiff;
-
-         if (seen[index] != seenItr) {
-            sum[index] += secretList[i] % 10;
-            seen[index] = seenItr;
-            if (sum[index] > ans) {
-               ans = sum[index];
-            }
-         }
+         index = ((index - (oldPriceDiff + 9) * powersOf19[0]) * 19 + (newPriceDiff + 9));
+         updateAns(index, secretList[i] % 10);
       }
    }
 
