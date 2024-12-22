@@ -4,6 +4,7 @@ using namespace std;
 using namespace chrono;
 
 const int MOD = 16777216;
+const int POWERS_OF_19[4] = {19 * 19 * 19, 19 * 19, 19, 1};
 
 int transform(long long secretNumber) {
    secretNumber ^= (secretNumber << 6);
@@ -15,8 +16,6 @@ int transform(long long secretNumber) {
    secretNumber ^= (secretNumber << 11);
    return secretNumber & (MOD - 1);
 }
-
-int powersOf19[4] = {19 * 19 * 19, 19 * 19, 19, 1};
 
 int sum[130321];
 int seen[130321];
@@ -60,7 +59,7 @@ int main() {
       int index = 0;
       for (int i = 0; i < 4; i++) {
          int priceDiff = secretList[i + 1] % 10 - secretList[i] % 10;
-         index += (priceDiff + 9) * powersOf19[i];
+         index += (priceDiff + 9) * POWERS_OF_19[i];
       }
 
       updateAns(index, secretList[4] % 10);
@@ -68,7 +67,7 @@ int main() {
       for (size_t i = 5; i < secretList.size(); i++) {
          int oldPriceDiff = secretList[i - 4] % 10 - secretList[i - 5] % 10;
          int newPriceDiff = secretList[i] % 10 - secretList[i - 1] % 10;
-         index = ((index - (oldPriceDiff + 9) * powersOf19[0]) * 19 + (newPriceDiff + 9));
+         index = ((index - (oldPriceDiff + 9) * POWERS_OF_19[0]) * 19 + (newPriceDiff + 9));
          updateAns(index, secretList[i] % 10);
       }
    }
