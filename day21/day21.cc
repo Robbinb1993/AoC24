@@ -126,13 +126,9 @@ int main() {
             totDist += solve(moveId[code[i]], moveId[code[i + 1]], 0);
         }
 
-        int codeVal = 0;
-        for (auto& c : code) {
-            if (isdigit(c))
-                codeVal = codeVal * 10 + c - '0';
-        }
-
-        ans += codeVal * totDist;
+        ans += accumulate(code.begin(), code.end(), 0,
+            [](int sum, char c) { return std::isdigit(c) ? sum * 10 + (c - '0') : sum; }
+        ) * totDist;
     }
 
     auto end = chrono::high_resolution_clock::now();
