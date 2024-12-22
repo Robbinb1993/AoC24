@@ -5,6 +5,7 @@ using namespace chrono;
 
 const int MOD = 16777216;
 const int POW_19_3 = 19 * 19 * 19;
+const int SEQ_INDEX_RANGE = 130321;
 
 static int transform(unsigned long long secretNumber) {
     unsigned long long result = secretNumber * 64;
@@ -21,8 +22,8 @@ static int transform(unsigned long long secretNumber) {
     return secretNumber % MOD;
 }
 
-int sum[130321];
-int seen[130321];
+int sum[SEQ_INDEX_RANGE];
+int seen[SEQ_INDEX_RANGE];
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -48,12 +49,13 @@ int main() {
             if (j >= 3 && seen[index] != seenItr) {
                 seen[index] = seenItr;
                 sum[index] += price;
-                if (sum[index] > ans2) {
-                    ans2 = sum[index];
-                }
             }
         }
         ans1 += secret;
+    }
+
+    for (int i = 0; i < SEQ_INDEX_RANGE; i++) {
+        ans2 = max(ans2, (long long)sum[i]);
     }
 
     auto end = high_resolution_clock::now();
