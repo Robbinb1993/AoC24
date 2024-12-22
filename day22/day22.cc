@@ -45,7 +45,7 @@ int main() {
             int delta = price - lastPrice;
             lastPrice = price;
             index = (index % (POW_19_3)) * 19 + (delta + 9);
-            if (j >= 2 && seen[index] != seenItr) {
+            if (j >= 3 && seen[index] != seenItr) {
                 seen[index] = seenItr;
                 sum[index] += price;
                 if (sum[index] > ans2) {
