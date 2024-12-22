@@ -99,7 +99,7 @@ long long solve(const int from, const int to, const int level) {
 
     long long bestDist = INF;
     for (auto& path : minPaths[from][to]) {
-        //After the previous move has been performed a layer higher (towards the NUM_PAD, the current robot will be at 
+        //After the previous move has been performed a layer higher (towards the NUM_PAD), the current robot will be at 
         //the 'A' position. We know this is true as he had to perform the actual move of the robot a layer higher by 
         //pressing the 'A' key on the keypad at the end. 
         //If the first move is yet to be performed, we know the robot will be at the starting position 'A' aswell.
