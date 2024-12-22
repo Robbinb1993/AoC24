@@ -55,7 +55,6 @@ int main() {
          secretList.push_back(secret);
       }
 
-
       for (size_t i = 4; i < secretList.size(); i++) {
          int index = calculateIndex(
             secretList[i - 3] % 10 - secretList[i - 4] % 10,
