@@ -6,18 +6,14 @@ using namespace chrono;
 const int MOD = 16777216;
 
 int transform(long long secretNumber) {
-   long long result = secretNumber * 64;
-   secretNumber ^= result;
-   secretNumber %= MOD;
+   secretNumber ^= (secretNumber << 6);
+   secretNumber &= MOD - 1;
 
-   result = secretNumber / 32;
-   secretNumber ^= result;
-   secretNumber %= MOD;
+   secretNumber ^= (secretNumber >> 5);
+   secretNumber &= MOD - 1;
 
-   result = secretNumber * 2048;
-   secretNumber ^= result;
-
-   return secretNumber % MOD;
+   secretNumber ^= (secretNumber << 11);
+   return secretNumber & (MOD - 1);
 }
 
 int calculateIndex(int i, int j, int k, int l) {
@@ -51,6 +47,7 @@ int main() {
       vector<int> secretList;
       secretList.push_back(secret);
       for (int j = 0; j < 2000; j++) {
+
          secret = transform(secret);
          secretList.push_back(secret);
       }
