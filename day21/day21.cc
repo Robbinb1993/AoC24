@@ -127,7 +127,7 @@ int main() {
         }
 
         ans += accumulate(code.begin(), code.end(), 0,
-            [](int sum, char c) { return std::isdigit(c) ? sum * 10 + (c - '0') : sum; }
+            [](int sum, char c) { return isdigit(c) ? sum * 10 + (c - '0') : sum; }
         ) * totDist;
     }
 
