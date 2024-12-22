@@ -6,14 +6,15 @@ using namespace chrono;
 const int MOD = 16777216;
 
 int transform(long long secretNumber) {
-   long long result = (secretNumber << 6);
+   long long result = secretNumber * 64;
    secretNumber ^= result;
    secretNumber %= MOD;
 
-   secretNumber ^= (secretNumber >> 5);
+   result = secretNumber / 32;
+   secretNumber ^= result;
    secretNumber %= MOD;
 
-   secretNumber ^= (secretNumber << 11);
+   result = secretNumber * 2048;
    secretNumber ^= result;
 
    return secretNumber % MOD;
