@@ -53,11 +53,7 @@ void genMinPaths(const int from, const int to, const vector<vector<char>>& pad) 
 }
 
 void init() {
-    moveId['^'] = 0;
-    moveId['>'] = 1;
-    moveId['v'] = 2;
-    moveId['<'] = 3;
-    moveId['A'] = 4;
+    moveId['^'] = 0; moveId['>'] = 1; moveId['v'] = 2; moveId['<'] = 3; moveId['A'] = 4;
     for (char c = '0'; c <= '9'; c++) {
         moveId[c] = 5 + c - '0';
     }
