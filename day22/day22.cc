@@ -51,7 +51,6 @@ int main() {
       vector<int> secretList;
       secretList.push_back(secret);
       for (int j = 0; j < 2000; j++) {
-
          secret = transform(secret);
          secretList.push_back(secret);
       }
