@@ -23,14 +23,10 @@ int moveId[256];
 vector<string> minPaths[15][15];
 
 pair<int, int> findLocation(const vector<vector<char>>& pad, char key) {
-    for (int i = 0; i < pad.size(); ++i) {
-        for (int j = 0; j < pad[i].size(); ++j) {
-            if (pad[i][j] == key) {
-                return {i, j};
-            }
-        }
-    }
-    return {-1, -1};
+    for (int i = 0;i<int(pad.size());i++)
+        for (int j = 0;j<int(pad[i].size());j++)
+            if (pad[i][j] == key)return {i,j};
+    return {-1,-1};
 }
 
 void genMinPaths(const int from, const int to, const vector<vector<char>>& pad) {
