@@ -15,7 +15,7 @@ static bitset<MAXN> adj[MAXN];
 static bitset<MAXN> bestSet;
 int bestSize = 0;
 
-void BK(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
+void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
     if (!P.any() && !X.any()) {
         int sz = (int)R.count();
         if (sz > bestSize) {
@@ -28,10 +28,7 @@ void BK(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
 
     // pick first bit in (P|X)
     bitset<MAXN> px = (P | X);
-    for (int i = px._Find_first(); i < MAXN; i = px._Find_next(i)) {
-        pivot = i;
-        break;
-    }
+    pivot = px._Find_first();
 
     // explore P \ neighbors(pivot)
     bitset<MAXN> toExplore = P & ~adj[pivot];
@@ -39,7 +36,7 @@ void BK(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
         bitset<MAXN> R2 = R; R2.set(v);
         bitset<MAXN> P2 = P & adj[v];
         bitset<MAXN> X2 = X & adj[v];
-        BK(R2, P2, X2);
+        BronKerbosch(R2, P2, X2);
         P.reset(v);
         X.set(v);
     }
@@ -65,14 +62,14 @@ int main() {
         edges[id1].insert(id2);
         edges[id2].insert(id1);
     }
-    // Build bitsets
+
     for (int i = 0; i < id; i++)
         for (auto& n : edges[i]) adj[i].set(n);
 
     bitset<MAXN> R, P, X;
     for (int i = 0; i < id; i++) P.set(i);
 
-    BK(R, P, X);
+    BronKerbosch(R, P, X);
 
     vector<string> names;
     for (int i = bestSet._Find_first(); i < MAXN; i = bestSet._Find_next(i)) {
