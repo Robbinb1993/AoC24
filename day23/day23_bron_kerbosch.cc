@@ -57,10 +57,10 @@ int colorBound(const bitset<MAXN>& P, int N) {
 }
 
 void BronKerbosch(
-    bitset<MAXN> R, // current clique
-    bitset<MAXN> P, // candidate vertices that can still join R
-    int N,          // total vertices
-    int cliqueSize  // current clique size
+    bitset<MAXN> R, // Current clique
+    bitset<MAXN> P, // Candidate vertices that can still join R
+    int N,          // Total vertices in the graph
+    int cliqueSize
 ) {
     // If P is empty, we have found a clique that cannot be expanded.
     if (!P.any()) {
