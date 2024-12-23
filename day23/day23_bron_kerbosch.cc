@@ -14,11 +14,10 @@ int bestSize = 0;
 // P is the set of candidates for the maximal clique.
 // R is the current set of vertices forming the growing clique.
 // X is the set of vertices already processed that cannot be part of any new clique with the current R.
-void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X, const int N) {
-    if (!P.any() && !X.any()) {
-        int sz = (int)R.count();
-        if (sz > bestSize) {
-            bestSize = sz;
+void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueSize) {
+    if (!P.any()) {
+        if (cliqueSize > bestSize) {
+            bestSize = cliqueSize;
             bestSet = R;
         }
         return;
@@ -26,18 +25,15 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X, const int N) {
     int pivot = -1;
 
     // Pick first bit in (P|X) as the pivot.
-    bitset<MAXN> PX = (P | X);
-    pivot = PX._Find_first();
+    pivot = P._Find_first();
 
     // Explore P \ neighbors(pivot).
     bitset<MAXN> toExplore = P & ~adj[pivot];
     for (int v = toExplore._Find_first(); v < N; v = toExplore._Find_next(v)) {
-        bitset<MAXN> R2 = R; R2.set(v);
-        bitset<MAXN> P2 = P & adj[v];
-        bitset<MAXN> X2 = X & adj[v];
-        BronKerbosch(R2, P2, X2, N);
+        bitset<MAXN> nextR = R;
+        nextR.set(v);
+        BronKerbosch(nextR, P & adj[v], N, cliqueSize + 1);
         P.reset(v);
-        X.set(v);
     }
 }
 
@@ -67,13 +63,11 @@ int main() {
         mx = max(mx, (int)adj[i].count());
     }
 
-    bitset<MAXN> R, P, X;
+    bitset<MAXN> R, P;
     P.set();
     P >>= (MAXN - id);
 
-    cout << id << endl;
-
-    BronKerbosch(R, P, X, id);
+    BronKerbosch(R, P, id, 0);
 
     vector<string> names;
     for (int i = bestSet._Find_first(); i < MAXN; i = bestSet._Find_next(i)) {
