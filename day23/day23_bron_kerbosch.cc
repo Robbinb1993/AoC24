@@ -3,16 +3,18 @@
 using namespace std;
 using namespace chrono;
 
-static const int MAXN = 700;
-
 unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
 
+static const int MAXN = 700;
 static bitset<MAXN> adj[MAXN], bestSet;
 int bestSize = 0;
 
-void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
+// P is the set of candidates for the maximal clique.
+// R is the current set of vertices forming the growing clique.
+// X is the set of vertices already processed that cannot be part of any new clique with the current R.
+void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X, const int N) {
     if (!P.any() && !X.any()) {
         int sz = (int)R.count();
         if (sz > bestSize) {
@@ -29,11 +31,11 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
 
     // Explore P \ neighbors(pivot).
     bitset<MAXN> toExplore = P & ~adj[pivot];
-    for (int v = toExplore._Find_first(); v < MAXN; v = toExplore._Find_next(v)) {
+    for (int v = toExplore._Find_first(); v < N; v = toExplore._Find_next(v)) {
         bitset<MAXN> R2 = R; R2.set(v);
         bitset<MAXN> P2 = P & adj[v];
         bitset<MAXN> X2 = X & adj[v];
-        BronKerbosch(R2, P2, X2);
+        BronKerbosch(R2, P2, X2, N);
         P.reset(v);
         X.set(v);
     }
@@ -60,11 +62,18 @@ int main() {
         adj[id2].set(id1);
     }
 
+    int mx = 0;
+    for (int i = 0; i < id; i++) {
+        mx = max(mx, (int)adj[i].count());
+    }
+
     bitset<MAXN> R, P, X;
     P.set();
     P >>= (MAXN - id);
 
-    BronKerbosch(R, P, X);
+    cout << id << endl;
+
+    BronKerbosch(R, P, X, id);
 
     vector<string> names;
     for (int i = bestSet._Find_first(); i < MAXN; i = bestSet._Find_next(i)) {
