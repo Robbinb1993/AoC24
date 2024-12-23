@@ -47,7 +47,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("in.txt", "r", stdin);
+    freopen("aoc-2024-day-23-challenge-1.txt", "r", stdin);
 
     string line;
     while (getline(cin, line)) {
