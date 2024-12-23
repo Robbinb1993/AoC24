@@ -13,7 +13,6 @@ int bestSize = 0;
 
 // P is the set of candidates for the maximal clique.
 // R is the current set of vertices forming the growing clique.
-// X is the set of vertices already processed that cannot be part of any new clique with the current R.
 void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueSize) {
     if (!P.any()) {
         if (cliqueSize > bestSize) {
