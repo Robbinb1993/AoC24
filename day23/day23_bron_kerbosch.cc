@@ -67,7 +67,8 @@ int main() {
         for (auto& n : edges[i]) adj[i].set(n);
 
     bitset<MAXN> R, P, X;
-    for (int i = 0; i < id; i++) P.set(i);
+    P.set();
+    P >>= (MAXN - id);
 
     BronKerbosch(R, P, X);
 
