@@ -21,6 +21,9 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueS
         }
         return;
     }
+
+    if (cliqueSize + P.count() <= bestSize) return;
+
     int pivot = -1;
 
     // Pick first bit in P as the pivot.
@@ -42,7 +45,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("aoc-2024-day-23-challenge-6.txt", "r", stdin);
+    freopen("aoc-2024-day-23-challenge-5.txt", "r", stdin);
 
     string line;
     while (getline(cin, line)) {
@@ -55,11 +58,6 @@ int main() {
         int id1 = getId[s1], id2 = getId[s2];
         adj[id1].set(id2);
         adj[id2].set(id1);
-    }
-
-    int mx = 0;
-    for (int i = 0; i < id; i++) {
-        mx = max(mx, (int)adj[i].count());
     }
 
     bitset<MAXN> R, P;
