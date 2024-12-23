@@ -23,17 +23,17 @@ void generateMaxClique(const int idx, const vector<int>& candidates, vector<int>
         return;
     }
 
-    int v = candidates[idx];
+    int candidate = candidates[idx];
     bool isClique = true;
     for (int i = 0; i < int(clique.size()); i++) {
-        if (!isConnected[v][clique[i]]) {
+        if (!isConnected[candidate][clique[i]]) {
             isClique = false;
             break;
         }
     }
 
     if (isClique) {
-        clique.push_back(v);
+        clique.push_back(candidate);
         generateMaxClique(idx + 1, candidates, clique);
         clique.pop_back();
     }
