@@ -2,72 +2,46 @@
 #include <chrono>
 using namespace std;
 using namespace chrono;
-const int MAXN = 1000;
+
+static const int MAXN = 700;
 
 unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
 unordered_set<int> edges[MAXN];
-unordered_set<int> maxClique = {};
+unordered_set<int> maxClique;
 
-int choosePivot(const unordered_set<int>& P, const unordered_set<int>& X) {
-    int pivot = -1;
-    int maxDegree = -1;
+static bitset<MAXN> adj[MAXN];
+static bitset<MAXN> bestSet;
+int bestSize = 0;
 
-    unordered_set<int> candidates(P.begin(), P.end());
-    candidates.insert(X.begin(), X.end());
-
-    for (int u : candidates) {
-        int degree = 0;
-        for (int neighbor : edges[u]) {
-            if (P.count(neighbor)) {
-                degree++;
-            }
-        }
-        if (degree > maxDegree) {
-            maxDegree = degree;
-            pivot = u;
-        }
-    }
-
-    return pivot;
-}
-
-//P is the set of candidates for the clique, starting with all vertices
-void BronKerbosch(unordered_set<int> R, unordered_set<int> P, unordered_set<int> X) {
-    if (P.empty() && X.empty()) {
-        if (R.size() > maxClique.size()) {
-            maxClique = R;
+void BK(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
+    if (!P.any() && !X.any()) {
+        int sz = (int)R.count();
+        if (sz > bestSize) {
+            bestSize = sz;
+            bestSet = R;
         }
         return;
     }
+    int pivot = -1;
 
-    int pivot = choosePivot(P, X);
-
-    unordered_set<int> candidates(P);
-    for (int neighbor : edges[pivot]) {
-        candidates.erase(neighbor);
+    // pick first bit in (P|X)
+    bitset<MAXN> px = (P | X);
+    for (int i = px._Find_first(); i < MAXN; i = px._Find_next(i)) {
+        pivot = i;
+        break;
     }
 
-    for (auto candidate : candidates) {
-        R.insert(candidate);
-
-        unordered_set<int> newP, newX;
-
-        for (int neighbor : edges[candidate]) {
-            if (P.count(neighbor)) {
-                newP.insert(neighbor);
-            }
-            if (X.count(neighbor)) {
-                newX.insert(neighbor);
-            }
-        }
-
-        BronKerbosch(R, newP, newX);
-
-        R.erase(candidate);
-        P.erase(candidate);
-        X.insert(candidate);
+    // explore P \ neighbors(pivot)
+    bitset<MAXN> toExplore = P & ~adj[pivot];
+    for (int v = toExplore._Find_first(); v < MAXN; v = toExplore._Find_next(v)) {
+        bitset<MAXN> R2 = R; R2.set(v);
+        bitset<MAXN> P2 = P & adj[v];
+        bitset<MAXN> X2 = X & adj[v];
+        BK(R2, P2, X2);
+        P.reset(v);
+        X.set(v);
     }
 }
 
@@ -77,7 +51,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("aoc-2024-day-23-challenge-3.txt", "r", stdin);
+    freopen("aoc-2024-day-23-challenge-5.txt", "r", stdin);
 
     string line;
     while (getline(cin, line)) {
@@ -85,48 +59,35 @@ int main() {
         stringstream ss(line);
         getline(ss, s1, '-');
         getline(ss, s2, '-');
-
-        if (getId.emplace(s1, id).second) {
-            getName.push_back(s1);
-            id++;
-        }
-        if (getId.emplace(s2, id).second) {
-            getName.push_back(s2);
-            id++;
-        }
-
-        int id1 = getId[s1];
-        int id2 = getId[s2];
-
+        if (getId.emplace(s1, id).second) { getName.push_back(s1); id++; }
+        if (getId.emplace(s2, id).second) { getName.push_back(s2); id++; }
+        int id1 = getId[s1], id2 = getId[s2];
         edges[id1].insert(id2);
         edges[id2].insert(id1);
     }
+    // Build bitsets
+    for (int i = 0; i < id; i++)
+        for (auto& n : edges[i]) adj[i].set(n);
 
-    unordered_set<int> R, P, X;
-    for (int i = 0; i < id; i++) {
-        P.insert(i);
-    }
+    bitset<MAXN> R, P, X;
+    for (int i = 0; i < id; i++) P.set(i);
 
-    BronKerbosch(R, P, X);
+    BK(R, P, X);
 
     vector<string> names;
-    for (int v : maxClique) {
-        names.push_back(getName[v]);
+    for (int i = bestSet._Find_first(); i < MAXN; i = bestSet._Find_next(i)) {
+        names.push_back(getName[i]);
     }
-
     sort(names.begin(), names.end());
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
 
-    cout << "Time: " << duration.count() << " milliseconds" << endl;
-
-    for (int i = 0; i < int(names.size()); i++) {
-        if (i)
-            cout << ",";
+    cout << "Time: " << duration.count() << " milliseconds\n";
+    for (int i = 0; i < (int)names.size(); i++) {
+        if (i) cout << ",";
         cout << names[i];
     }
     cout << endl;
-
     return 0;
 }
