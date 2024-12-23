@@ -24,7 +24,7 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueS
     }
     int pivot = -1;
 
-    // Pick first bit in (P|X) as the pivot.
+    // Pick first bit in P as the pivot.
     pivot = P._Find_first();
 
     // Explore P \ neighbors(pivot).
