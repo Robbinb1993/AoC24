@@ -7,7 +7,6 @@ const int MAXN = 1000;
 unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
-bool isConnected[MAXN][MAXN];
 unordered_set<int> edges[MAXN];
 unordered_set<int> maxClique = {};
 
@@ -34,6 +33,7 @@ int choosePivot(const unordered_set<int>& P, const unordered_set<int>& X) {
     return pivot;
 }
 
+//P is the set of candidates for the clique, starting with all vertices
 void BronKerbosch(unordered_set<int> R, unordered_set<int> P, unordered_set<int> X) {
     if (P.empty() && X.empty()) {
         if (R.size() > maxClique.size()) {
@@ -98,8 +98,6 @@ int main() {
         int id1 = getId[s1];
         int id2 = getId[s2];
 
-        isConnected[id1][id2] = true;
-        isConnected[id2][id1] = true;
         edges[id1].insert(id2);
         edges[id2].insert(id1);
     }
