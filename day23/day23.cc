@@ -2,7 +2,7 @@
 #include <chrono>
 using namespace std;
 using namespace chrono;
-const int MAXN = 3500;
+const int MAXN = 1000;
 
 unordered_map<string, int> getId;
 vector<string> getName;
@@ -73,9 +73,6 @@ int main() {
         edges[id1].push_back(id2);
         edges[id2].push_back(id1);
     }
-
-
-    int best = 0;
 
     for (int i = 0; i < id; i++) {
         vector<int> clique = {i};
