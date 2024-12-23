@@ -75,7 +75,7 @@ void BronKerbosch(
         return;
     }
 
-    //Color bound will be the an upperbound for the size of the largest clique remaining in P.
+    //Color bound is an upperbound for the size of the largest clique remaining in P.
     int cBound = colorBound(P, N);
     if (cliqueSize + cBound <= bestSize) {
         return;
