@@ -7,8 +7,7 @@ unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
 
-static const int MAXN = 700
-;
+static const int MAXN = 700;
 static bitset<MAXN> adj[MAXN], bestSet;
 int bestSize = 0;
 
