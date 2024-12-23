@@ -90,8 +90,7 @@ int main() {
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
 
-    cout << "Time: "
-        << duration.count() << " milliseconds" << endl;
+    cout << "Time: " << duration.count() << " milliseconds" << endl;
 
     for (int i = 0; i < int(names.size()); i++) {
         cout << names[i] << ",";
