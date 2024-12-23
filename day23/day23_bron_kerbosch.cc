@@ -7,7 +7,8 @@ unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
 
-static const int MAXN = 700;
+static const int MAXN = 700
+;
 static bitset<MAXN> adj[MAXN], bestSet;
 int bestSize = 0;
 
@@ -43,7 +44,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("aoc-2024-day-23-challenge-7.txt", "r", stdin);
+    freopen("aoc-2024-day-23-challenge-5.txt", "r", stdin);
 
     string line;
     while (getline(cin, line)) {
