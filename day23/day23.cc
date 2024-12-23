@@ -9,6 +9,37 @@ vector<string> getName;
 int id = 0;
 bool isConnected[MAXN][MAXN];
 vector<int> edges[MAXN];
+vector<int> maxClique = {};
+
+void generateMaxClique(const int idx, const vector<int>& candidates, vector<int>& clique) {
+    if (idx == int(candidates.size())) {
+        if (clique.size() > maxClique.size()) {
+            maxClique = clique;
+        }
+        return;
+    }
+
+    if (clique.size() + candidates.size() - idx <= maxClique.size()) {
+        return;
+    }
+
+    int v = candidates[idx];
+    bool isClique = true;
+    for (int i = 0; i < int(clique.size()); i++) {
+        if (!isConnected[v][clique[i]]) {
+            isClique = false;
+            break;
+        }
+    }
+
+    if (isClique) {
+        clique.push_back(v);
+        generateMaxClique(idx + 1, candidates, clique);
+        clique.pop_back();
+    }
+
+    generateMaxClique(idx + 1, candidates, clique);
+}
 
 int main() {
     ios_base::sync_with_stdio(false);
@@ -43,46 +74,17 @@ int main() {
         edges[id2].push_back(id1);
     }
 
-    vector<int> res;
+
     int best = 0;
 
     for (int i = 0; i < id; i++) {
-        int totEdges = int(edges[i].size());
-        for (int bm = 0; bm < (1 << totEdges); bm++) {
-            if (best >= __builtin_popcount(bm)) {
-                continue;
-            }
-
-            vector<int> nodes;
-
-            for (int bit = 0; bit < totEdges; bit++) {
-                if (bm & (1 << bit)) {
-                    nodes.push_back(edges[i][bit]);
-                }
-            }
-
-            bool valid = true;
-
-            for (int i = 0; i < int(nodes.size()) && valid; i++) {
-                for (int j = i + 1; j < int(nodes.size()) && valid; j++) {
-                    if (!isConnected[nodes[i]][nodes[j]]) {
-                        valid = false;
-                    }
-                }
-            }
-
-            if (!valid)
-                continue;
-
-            best = int(nodes.size());
-            nodes.push_back(i);
-            res = nodes;
-        }
+        vector<int> clique = {i};
+        generateMaxClique(0, edges[i], clique);
     }
 
     vector<string> names;
-    for (int i = 0; i < int(res.size()); i++) {
-        names.push_back(getName[res[i]]);
+    for (int i = 0; i < int(maxClique.size()); i++) {
+        names.push_back(getName[maxClique[i]]);
     }
 
     sort(names.begin(), names.end());
@@ -93,7 +95,9 @@ int main() {
     cout << "Time: " << duration.count() << " milliseconds" << endl;
 
     for (int i = 0; i < int(names.size()); i++) {
-        cout << names[i] << ",";
+        if (i)
+            cout << ",";
+        cout << names[i];
     }
 
     cout << endl;
