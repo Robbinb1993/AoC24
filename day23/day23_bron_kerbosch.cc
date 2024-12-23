@@ -7,14 +7,14 @@ unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
 
-static const int MAXN = 700;
+static const int MAXN = 500;
 static bitset<MAXN> adj[MAXN], bestSet;
 int bestSize = 0;
 
 // This method greedily colors the subgraph induced by P
 // and returns the number of colors used. No adjacent vertices
 // in P will have the same color and the colors used are minimal.
-// It will be an upper bound for the size of the largest clique in P.
+// It is an upper bound for the size of the largest clique remaining in P.
 int colorBound(const bitset<MAXN>& P, int N) {
     static int color[MAXN];
     memset(color, 0, sizeof(color));
