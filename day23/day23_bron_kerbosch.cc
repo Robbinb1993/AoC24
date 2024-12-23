@@ -24,10 +24,8 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueS
 
     if (cliqueSize + P.count() <= bestSize) return;
 
-    int pivot = -1;
-
     // Pick first bit in P as the pivot.
-    pivot = P._Find_first();
+    int pivot = P._Find_first();
 
     // Explore P \ neighbors(pivot).
     bitset<MAXN> toExplore = P & ~adj[pivot];
@@ -45,7 +43,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("aoc-2024-day-23-challenge-5.txt", "r", stdin);
+    freopen("aoc-2024-day-23-challenge-7.txt", "r", stdin);
 
     string line;
     while (getline(cin, line)) {
