@@ -11,9 +11,58 @@ static const int MAXN = 700;
 static bitset<MAXN> adj[MAXN], bestSet;
 int bestSize = 0;
 
-// P is the set of candidates for the maximal clique.
-// R is the current set of vertices forming the growing clique.
-void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueSize) {
+// This method greedily colors the subgraph induced by P
+// and returns the number of colors used. No adjacent vertices
+// in P will have the same color and the colors used are minimal.
+// It will be an upper bound for the size of the largest clique in P.
+int colorBound(const bitset<MAXN>& P, int N) {
+    static int color[MAXN];
+    memset(color, 0, sizeof(color));
+
+    vector<int> vertices;
+    for (int v = P._Find_first(); v < N; v = P._Find_next(v)) {
+        vertices.push_back(v);
+    }
+
+    int usedColors = 0;
+    // Greedy color each vertex in P
+    for (int v : vertices) {
+        // For each color, check if we can color vertex v with that color
+        // by verifying it does not conflict with neighbors of v that are 
+        // already colored with the same color.
+        bool placed = false;
+        for (int c = 1; c <= usedColors; c++) {
+            bool conflict = false;
+            // Check adjacency with other vertices that have color c
+            for (int u : vertices) {
+                if (color[u] == c && adj[v].test(u)) {
+                    conflict = true;
+                    break;
+                }
+            }
+            if (!conflict) {
+                color[v] = c;
+                placed = true;
+                break;
+            }
+        }
+        // If we found no color that fits, we add a new color
+        if (!placed) {
+            usedColors++;
+            color[v] = usedColors;
+        }
+    }
+
+    return usedColors;
+}
+
+void BronKerbosch(
+    bitset<MAXN> R, // current clique
+    bitset<MAXN> P, // candidate vertices that can still join R
+    int N,          // total vertices
+    int cliqueSize  // current clique size
+) {
+    // If P is empty, we have found a clique that cannot be expanded.
     if (!P.any()) {
         if (cliqueSize > bestSize) {
             bestSize = cliqueSize;
@@ -22,12 +71,19 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, const int N, const int cliqueS
         return;
     }
 
-    if (cliqueSize + P.count() <= bestSize) return;
+    if (cliqueSize + (int)P.count() <= bestSize) {
+        return;
+    }
 
-    // Pick first bit in P as the pivot.
+    //Color bound will be the an upperbound for the size of the largest clique remaining in P.
+    int cBound = colorBound(P, N);
+    if (cliqueSize + cBound <= bestSize) {
+        return;
+    }
+
     int pivot = P._Find_first();
 
-    // Explore P \ neighbors(pivot).
+    // Explore P \ neighbors(pivot)
     bitset<MAXN> toExplore = P & ~adj[pivot];
     for (int v = toExplore._Find_first(); v < N; v = toExplore._Find_next(v)) {
         bitset<MAXN> nextR = R;
@@ -57,6 +113,8 @@ int main() {
         adj[id1].set(id2);
         adj[id2].set(id1);
     }
+
+    cout << id << endl;
 
     bitset<MAXN> R, P;
     P.set();
