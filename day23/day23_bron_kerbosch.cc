@@ -8,11 +8,8 @@ static const int MAXN = 700;
 unordered_map<string, int> getId;
 vector<string> getName;
 int id = 0;
-unordered_set<int> edges[MAXN];
-unordered_set<int> maxClique;
 
-static bitset<MAXN> adj[MAXN];
-static bitset<MAXN> bestSet;
+static bitset<MAXN> adj[MAXN], bestSet;
 int bestSize = 0;
 
 void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
@@ -26,11 +23,11 @@ void BronKerbosch(bitset<MAXN> R, bitset<MAXN> P, bitset<MAXN> X) {
     }
     int pivot = -1;
 
-    // pick first bit in (P|X)
-    bitset<MAXN> px = (P | X);
-    pivot = px._Find_first();
+    // Pick first bit in (P|X) as the pivot.
+    bitset<MAXN> PX = (P | X);
+    pivot = PX._Find_first();
 
-    // explore P \ neighbors(pivot)
+    // Explore P \ neighbors(pivot).
     bitset<MAXN> toExplore = P & ~adj[pivot];
     for (int v = toExplore._Find_first(); v < MAXN; v = toExplore._Find_next(v)) {
         bitset<MAXN> R2 = R; R2.set(v);
@@ -48,7 +45,7 @@ int main() {
 
     auto start = high_resolution_clock::now();
 
-    freopen("aoc-2024-day-23-challenge-5.txt", "r", stdin);
+    freopen("aoc-2024-day-23-challenge-6.txt", "r", stdin);
 
     string line;
     while (getline(cin, line)) {
@@ -59,12 +56,9 @@ int main() {
         if (getId.emplace(s1, id).second) { getName.push_back(s1); id++; }
         if (getId.emplace(s2, id).second) { getName.push_back(s2); id++; }
         int id1 = getId[s1], id2 = getId[s2];
-        edges[id1].insert(id2);
-        edges[id2].insert(id1);
+        adj[id1].set(id2);
+        adj[id2].set(id1);
     }
-
-    for (int i = 0; i < id; i++)
-        for (auto& n : edges[i]) adj[i].set(n);
 
     bitset<MAXN> R, P, X;
     P.set();
@@ -80,6 +74,8 @@ int main() {
 
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start);
+
+    cout << int(names.size()) << endl;
 
     cout << "Time: " << duration.count() << " milliseconds\n";
     for (int i = 0; i < (int)names.size(); i++) {
