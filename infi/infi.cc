@@ -38,35 +38,20 @@ void readInstructions() {
     }
 }
 
-int getParamValue(const Instruction& instr, const int x, const int y, const int z) {
-    if (holds_alternative<int>(instr.param)) {
-        return get<int>(instr.param);
-    }
-    else if (holds_alternative<char>(instr.param)) {
-        char var = get<char>(instr.param);
-        switch (var) {
-        case 'X': return x;
-        case 'Y': return y;
-        case 'Z': return z;
-        default:
-            throw invalid_argument("Invalid variable: " + string(1, var));
-        }
-    }
-    throw invalid_argument("Parameter is neither int nor char.");
-}
-
 int solve(const int x, const int y, const int z) {
     int pc = 0;
     stack<int> S;
 
-    while (true) {
-        auto& instr = instructions[pc];
+    while (pc < instructions.size()) {
+        const auto& instr = instructions[pc];
         switch (instr.type) {
-        case InstructionType::PUSH:
-            S.push(getParamValue(instr, x, y, z));
+        case PUSH:
+            S.push(holds_alternative<int>(instr.param) ? get<int>(instr.param)
+                : (get<char>(instr.param) == 'X' ? x
+                    : get<char>(instr.param) == 'Y' ? y : z));
             break;
 
-        case InstructionType::ADD:
+        case ADD:
             if (S.size() >= 2) {
                 int a = S.top(); S.pop();
                 int b = S.top(); S.pop();
@@ -74,29 +59,22 @@ int solve(const int x, const int y, const int z) {
             }
             break;
 
-        case InstructionType::JMPOS:
+        case JMPOS:
             if (!S.empty()) {
-                int topVal = S.top();
-                S.pop();
-                if (topVal >= 0) {
-                    pc += getParamValue(instr, x, y, z);
+                if (S.top() >= 0) {
+                    pc += get<int>(instr.param);
                 }
+                S.pop();
             }
             break;
-
-        case InstructionType::RET:
-            if (!S.empty()) {
-                return S.top();
-            }
-            return 0;
+        case RET:
+            return S.empty() ? 0 : S.top();
         }
 
         pc++;
-
-        if (pc >= instructions.size()) throw("Invalid program counter");
     }
 
-    return 0;
+    throw("No return instruction found");
 }
 
 bool isNewCloud[MAX_X][MAX_Y][MAX_Z];
