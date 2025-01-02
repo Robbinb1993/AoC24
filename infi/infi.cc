@@ -63,7 +63,7 @@ void readInstructions() {
     }
 }
 
-int getParamValue(const Instruction& instr, int x, int y, int z) {
+int getParamValue(const Instruction& instr, const int x, const int y, const int z) {
     if (holds_alternative<int>(instr.param)) {
         return get<int>(instr.param);
     }
