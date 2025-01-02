@@ -21,44 +21,19 @@ vector<Instruction> instructions;
 
 void readInstructions() {
     freopen("in.txt", "r", stdin);
-
-    string line;
-    while (getline(cin, line)) {
-        istringstream iss(line);
+    string type, param;
+    while (cin >> type) {
         Instruction instr;
-        string type;
+        if (type == "push") instr.type = PUSH;
+        else if (type == "add") instr.type = ADD;
+        else if (type == "jmpos") instr.type = JMPOS;
+        else if (type == "ret") instr.type = RET;
 
-        iss >> type;
-        if (type == "push") {
-            instr.type = InstructionType::PUSH;
+        if (instr.type == PUSH || instr.type == JMPOS) {
+            cin >> param;
+            if (isdigit(param[0]) || param[0] == '-') instr.param = stoi(param);
+            else instr.param = param[0];
         }
-        else if (type == "add") {
-            instr.type = InstructionType::ADD;
-        }
-        else if (type == "jmpos") {
-            instr.type = InstructionType::JMPOS;
-        }
-        else if (type == "ret") {
-            instr.type = InstructionType::RET;
-        }
-
-        if (instr.type == InstructionType::PUSH || instr.type == InstructionType::JMPOS) {
-            iss >> ws;
-            if (isdigit(iss.peek()) || iss.peek() == '-') {
-                int param;
-                iss >> param;
-                instr.param = param;
-            }
-            else {
-                char param;
-                iss >> param;
-                instr.param = param;
-            }
-        }
-        else {
-            instr.param = monostate{};
-        }
-
         instructions.push_back(instr);
     }
 }
