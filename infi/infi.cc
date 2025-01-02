@@ -124,16 +124,16 @@ int solve(const int x, const int y, const int z) {
     return 0;
 }
 
-bool isCloud[MAX_X][MAX_Y][MAX_Z];
+bool isNewCloud[MAX_X][MAX_Y][MAX_Z];
 const int DX[6] = {1, -1, 0, 0, 0, 0};
 const int DY[6] = {0, 0, 1, -1, 0, 0};
 const int DZ[6] = {0, 0, 0, 0, 1, -1};
 
 void floodFill(const int x, const int y, const int z) {
     if (x < 0 || x >= MAX_X || y < 0 || y >= MAX_Y || z < 0 || z >= MAX_Z) return;
-    if (!isCloud[x][y][z]) return;
+    if (!isNewCloud[x][y][z]) return;
 
-    isCloud[x][y][z] = false;
+    isNewCloud[x][y][z] = false;
 
     for (int i = 0; i < 6; i++) {
         floodFill(x + DX[i], y + DY[i], z + DZ[i]);
@@ -152,7 +152,7 @@ int main() {
             for (int z = 0; z < MAX_Z; z++) {
                 int currAns = solve(x, y, z);
                 if (currAns > 0) {
-                    isCloud[x][y][z] = true;
+                    isNewCloud[x][y][z] = true;
                 }
                 ansPart1 += currAns;
             }
@@ -163,7 +163,7 @@ int main() {
     for (int x = 0; x < MAX_X; x++) {
         for (int y = 0; y < MAX_Y; y++) {
             for (int z = 0; z < MAX_Z; z++) {
-                if (isCloud[x][y][z]) {
+                if (isNewCloud[x][y][z]) {
                     ansPart2++;
                     floodFill(x, y, z);
                 }
