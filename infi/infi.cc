@@ -50,7 +50,6 @@ int solve(const int x, const int y, const int z) {
                 : (get<char>(instr.param) == 'X' ? x
                     : get<char>(instr.param) == 'Y' ? y : z));
             break;
-
         case ADD:
             if (S.size() >= 2) {
                 int a = S.top(); S.pop();
@@ -58,7 +57,6 @@ int solve(const int x, const int y, const int z) {
                 S.push(a + b);
             }
             break;
-
         case JMPOS:
             if (!S.empty()) {
                 if (S.top() >= 0) {
